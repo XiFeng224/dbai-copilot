@@ -1101,14 +1101,29 @@ elif pages == "🎯 竞赛教练智能助手":
             total_chunks = analysis.get("total_chunks", 0)
             keywords = analysis.get("keywords", {})
             
-            st.info(f"""
-            📊 **分析概览**
-            - 已分析文档数：{doc_count}
-            - 文档总段落：{total_chunks}
-            - 包含手动输入：{'是' if has_manual else '否'}
-            - 识别技术数：{len(analysis['tech_stack'])}
-            - 功能模块数：{len(analysis['features'])}
-            """)
+            # 检查分析结果结构
+            if 'agent_results' in analysis:
+                # 新的Agent分析结果结构
+                agent_results = analysis['agent_results']
+                completed_goals = sum(1 for outcome in agent_results.values() if outcome['status'] == 'completed')
+                st.info(f"""
+                📊 **Agent分析概览**
+                - 已分析文档数：{doc_count}
+                - 文档总段落：{total_chunks}
+                - 包含手动输入：{'是' if has_manual else '否'}
+                - Agent执行目标：{len(agent_results)}个
+                - 成功完成：{completed_goals}个
+                """)
+            else:
+                # 旧的静态分析结果结构
+                st.info(f"""
+                📊 **分析概览**
+                - 已分析文档数：{doc_count}
+                - 文档总段落：{total_chunks}
+                - 包含手动输入：{'是' if has_manual else '否'}
+                - 识别技术数：{len(analysis.get('tech_stack', []))}
+                - 功能模块数：{len(analysis.get('features', []))}
+                """)
             
             # 显示提取的关键词
             if keywords:
@@ -2579,8 +2594,13 @@ else:
         st.subheader("📊 实时监控")
         
         # 模拟监控数据
-        import plotly.graph_objects as go
-        import numpy as np
+        try:
+            import plotly.graph_objects as go
+            import numpy as np
+        except ImportError:
+            st.error("⚠️ 缺少必要的依赖包，请确保已安装plotly和numpy")
+            st.info("运行命令: pip install plotly numpy")
+            return
         
         # CPU使用率图表
         cpu_data = np.random.randint(20, 80, 10)
