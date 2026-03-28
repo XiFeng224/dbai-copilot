@@ -2600,19 +2600,21 @@ else:
         except ImportError:
             st.error("⚠️ 缺少必要的依赖包，请确保已安装plotly和numpy")
             st.info("运行命令: pip install plotly numpy")
-            return
-        
-        # CPU使用率图表
-        cpu_data = np.random.randint(20, 80, 10)
-        fig_cpu = go.Figure(go.Scatter(x=list(range(10)), y=cpu_data, mode='lines+markers'))
-        fig_cpu.update_layout(title='CPU使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
-        st.plotly_chart(fig_cpu, use_container_width=True)
-        
-        # 内存使用率图表
-        memory_data = np.random.randint(30, 90, 10)
-        fig_memory = go.Figure(go.Scatter(x=list(range(10)), y=memory_data, mode='lines+markers'))
-        fig_memory.update_layout(title='内存使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
-        st.plotly_chart(fig_memory, use_container_width=True)
+            st.warning("监控图表功能暂时不可用")
+            # 跳过图表绘制部分
+            pass
+        else:
+            # CPU使用率图表
+            cpu_data = np.random.randint(20, 80, 10)
+            fig_cpu = go.Figure(go.Scatter(x=list(range(10)), y=cpu_data, mode='lines+markers'))
+            fig_cpu.update_layout(title='CPU使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
+            st.plotly_chart(fig_cpu, use_container_width=True)
+            
+            # 内存使用率图表
+            memory_data = np.random.randint(30, 90, 10)
+            fig_memory = go.Figure(go.Scatter(x=list(range(10)), y=memory_data, mode='lines+markers'))
+            fig_memory.update_layout(title='内存使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
+            st.plotly_chart(fig_memory, use_container_width=True)
         
     with tab4:
         st.header("📋 操作日志")
