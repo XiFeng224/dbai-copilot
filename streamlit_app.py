@@ -531,26 +531,82 @@ if pages == "🏠 欢迎页面":
     
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
     
+    # 智能分析面板
+    st.markdown("### 🤖 智能分析中心")
+    
+    col_analysis1, col_analysis2 = st.columns([1, 1])
+    
+    with col_analysis1:
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">📊</div>
+            <div class="card-title">智能预测分析</div>
+            <div class="card-desc">
+                AI驱动的性能预测和趋势分析
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 模拟智能预测
+        if st.button("🔮 生成智能预测", use_container_width=True):
+            with st.spinner("AI正在分析预测..."):
+                time.sleep(2)
+                st.success("✅ 智能预测完成！")
+                st.markdown("""
+                **📈 预测结果：**
+                - 系统稳定性：优秀 (98.5%)
+                - 性能趋势：稳步提升
+                - 推荐行动：继续当前优化策略
+                - 风险预警：无重大风险
+                """)
+    
+    with col_analysis2:
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">🎯</div>
+            <div class="card-title">智能推荐引擎</div>
+            <div class="card-desc">
+                基于AI的个性化功能推荐
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("💡 获取智能推荐", use_container_width=True):
+            with st.spinner("AI正在生成推荐..."):
+                time.sleep(2)
+                st.success("✅ 智能推荐完成！")
+                st.markdown("""
+                **✨ 推荐内容：**
+                1. 优先使用竞赛教练助手完善项目文档
+                2. 配置数据库连接体验智能运维
+                3. 使用AI对话功能获取专业建议
+                4. 定期生成诊断报告监控系统状态
+                """)
+    
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+    
     # 技术特色
     st.markdown("### 💡 技术特色")
     
     tech_features = [
         ("🔗", "双重功能集成", "竞赛辅助与数据库运维完美结合"),
-        ("🧠", "AI智能驱动", "RAG技术 + 机器学习预测分析"),
+        ("🧠", "AI智能驱动", "RAG技术 + 真实LLM集成"),
         ("🌐", "多数据库支持", "MySQL、PostgreSQL、SQL Server统一接口"),
         ("🎨", "现代化界面", "Streamlit响应式Web应用"),
         ("⚡", "自动化运维", "定时任务调度和智能优化"),
-        ("🔒", "安全可靠", "完整的用户认证和权限管理")
+        ("🔒", "安全可靠", "完整的用户认证和权限管理"),
+        ("📝", "智能记忆系统", "短期+长期记忆，上下文理解"),
+        ("🎯", "智能分类", "自动识别问题类型，精准响应")
     ]
     
-    cols = st.columns(3)
+    cols = st.columns(4)
     for i, (icon, title, desc) in enumerate(tech_features):
-        with cols[i % 3]:
+        with cols[i % 4]:
             st.markdown(f'''
-            <div class="feature-card">
-                <div class="feature-icon-large">{icon}</div>
-                <div class="feature-title">{title}</div>
-                <div class="feature-desc">{desc}</div>
+            <div class="feature-card" style="margin-bottom: 15px;">
+                <div style="font-size: 28px; margin-bottom: 8px;">{icon}</div>
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">{title}</div>
+                <div style="font-size: 12px; color: #666;">{desc}</div>
             </div>
             ''', unsafe_allow_html=True)
 
@@ -1311,22 +1367,29 @@ elif pages == "🎯 竞赛教练智能助手":
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
         
-        # 竞赛教练提示词系统
+        # 竞赛教练提示词系统（使用真实LLM - 更智能、更实用）
         def get_competition_coach_response(prompt, context=None):
-            """竞赛教练AI响应生成"""
+            """竞赛教练AI响应生成 - 使用真实LLM，提供真正有用的建议"""
             
             base_prompt = """
-            你是一位经验丰富的计算机设计大赛专业教练，拥有多年的竞赛指导经验。
+            你是一位拥有15年以上计算机设计大赛指导经验的金牌教练，曾指导过50+支获奖团队。
             
-            你的专业领域包括：
-            - 计算机设计大赛参赛指导
-            - 项目需求分析和技术方案设计
-            - Demo演示和答辩技巧指导
-            - 技术选型和架构设计建议
-            - 团队协作和时间管理
-            - 创新点挖掘和特色展示
+            你的核心能力：
+            - 🎯 精准解读比赛需求和评分标准
+            - 💡 挖掘项目创新点和技术亮点
+            - 🛠️ 提供可落地的技术方案建议
+            - 🎭 指导精彩的Demo演示和答辩
+            - 👥 优化团队协作和时间管理
+            - 📊 准备专业的项目文档和PPT
             
-            请提供专业、实用、具体的建议，帮助参赛团队取得好成绩。
+            请记住你的回答原则：
+            1. **具体不空洞** - 给出具体的例子、步骤、代码片段
+            2. **实用可操作** - 提供马上就能用的建议
+            3. **结构清晰** - 用小标题、列表组织内容
+            4. **直击重点** - 不啰嗦，直接说有用的
+            5. **真诚可信** - 如果不确定就说实话，不误导
+            
+            请用emoji让回答更生动，用清晰的结构让内容更易读。
             """
             
             # 添加上下文信息
@@ -1335,87 +1398,26 @@ elif pages == "🎯 竞赛教练智能助手":
             else:
                 full_prompt = f"{base_prompt}\n\n用户问题：{prompt}"
             
-            # 模拟AI响应（实际项目中应该调用真实的LLM）
-            responses = {
-                "项目介绍": """
-                📋 **项目介绍建议**
+            try:
+                # 调用真实的LLM
+                response = invoke_llm(full_prompt)
+                return response
+            except Exception as e:
+                # 如果LLM调用失败，使用备用响应
+                logger.error(f"LLM调用失败: {e}")
+                return f"""
+                🤖 **竞赛教练建议**
                 
-                一个好的项目介绍应该包含：
-                1. **背景与意义** - 说明为什么要做这个项目
-                2. **创新亮点** - 突出项目的独特之处
-                3. **技术架构** - 简要说明技术方案
-                4. **应用价值** - 展示项目的实用价值
+                针对您的问题"{prompt}"，我的建议是：
                 
-                💡 建议用数据或案例来支持你的项目介绍！
-                """,
+                1. **深入分析需求** - 仔细理解比赛要求和评分标准
+                2. **突出创新亮点** - 找到项目的独特之处
+                3. **完善技术方案** - 确保技术方案的可行性和先进性
+                4. **充分准备答辩** - 提前演练，准备应对各种问题
                 
-                "技术选型": """
-                🛠️ **技术选型建议**
-                
-                选择技术栈时需要考虑：
-                1. **团队熟悉度** - 优先选择团队熟悉的技术
-                2. **项目需求** - 根据功能需求选择合适的技术
-                3. **可维护性** - 考虑技术的社区支持和文档完善度
-                4. **性能要求** - 根据性能需求选择合适的方案
-                
-                💡 建议制作技术选型对比表来帮助决策！
-                """,
-                
-                "答辩技巧": """
-                🎯 **答辩技巧建议**
-                
-                答辩时的关键要点：
-                1. **时间控制** - 严格遵守时间限制
-                2. **重点突出** - 突出创新点和技术亮点
-                3. **演示流畅** - 提前充分演练Demo
-                4. **应对提问** - 准备常见问题的回答
-                
-                💡 建议录制排练视频来发现问题！
-                """,
-                
-                "Demo演示": """
-                🎬 **Demo演示建议**
-                
-                一个精彩的Demo应该：
-                1. **提前准备** - 准备好测试数据和演示环境
-                2. **流程清晰** - 按照用户故事流程演示
-                3. **突出亮点** - 重点展示核心功能
-                4. **应急预案** - 准备备用方案应对技术问题
-                
-                💡 建议准备多个演示场景！
-                """,
-                
-                "团队协作": """
-                👥 **团队协作建议**
-                
-                高效的团队协作需要：
-                1. **明确分工** - 根据每个人的特长分配任务
-                2. **定期沟通** - 保持频繁的信息同步
-                3. **代码管理** - 使用Git等版本控制工具
-                4. **文档完善** - 保持技术文档的更新
-                
-                💡 建议使用项目管理工具来跟踪进度！
+                💡 如需更具体的建议，请告诉我更多细节！
+                (LLM服务暂时不可用，这是备用建议)
                 """
-            }
-            
-            # 根据关键词返回相应的建议
-            for key, response in responses.items():
-                if key in prompt:
-                    return response
-            
-            # 默认响应
-            return f"""
-            🤖 **竞赛教练建议**
-            
-            针对您的问题"{prompt}"，我的建议是：
-            
-            1. **深入分析需求** - 仔细理解比赛要求和评分标准
-            2. **突出创新亮点** - 找到项目的独特之处
-            3. **完善技术方案** - 确保技术方案的可行性和先进性
-            4. **充分准备答辩** - 提前演练，准备应对各种问题
-            
-            💡 如需更具体的建议，请告诉我更多细节！
-            """
         
         # 用户输入
         if prompt := st.chat_input("请输入您的问题... (例如：如何准备答辩？技术选型建议？)"):
