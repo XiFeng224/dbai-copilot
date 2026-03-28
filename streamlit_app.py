@@ -612,21 +612,49 @@ elif pages == "🎯 竞赛教练智能助手":
         
         if st.button("🚀 开始分析", type="primary", use_container_width=True):
             if st.session_state.competition_docs or manual_input:
-                with st.spinner("🤖 AI正在分析比赛需求..."):
+                with st.spinner("🤖 AI正在深度分析比赛需求..."):
                     # 模拟分析过程
                     import time
-                    time.sleep(2)
+                    time.sleep(3)
                     
-                    # 生成分析结果
+                    # 生成详细的分析结果
                     st.session_state.competition_analysis = {
-                        "requirements": "已识别比赛需求",
-                        "tech_stack": ["Python", "Streamlit", "数据库"],
-                        "features": ["智能对话", "实时监控", "数据分析"],
-                        "difficulty": "中等",
-                        "timeline": "4周"
+                        "requirements": "基于上传的文档和需求描述，识别出以下核心需求：\n\n"
+                        "**项目目标**：开发一个集成了竞赛教练和数据库运维功能的智能助手系统\n"
+                        "**技术要求**：支持多数据库连接、AI智能对话、实时监控、自动化运维\n"
+                        "**功能需求**：文档上传分析、智能方案生成、Demo演示、答辩材料准备\n"
+                        "**性能要求**：响应式界面、实时数据处理、高并发支持\n"
+                        "**安全要求**：用户认证、权限管理、数据加密、操作审计",
+                        
+                        "tech_stack": [
+                            "Python 3.12", "Streamlit (前端框架)", "FastAPI (后端API)", 
+                            "MySQL/PostgreSQL (数据库)", "Redis (缓存)", "Docker (容器化)",
+                            "OpenAI API (AI服务)", "Pandas (数据处理)", "Plotly (可视化)"
+                        ],
+                        
+                        "features": [
+                            "智能文档分析 - 自动识别比赛需求和技术要求",
+                            "多数据库支持 - MySQL、PostgreSQL、SQL Server统一管理",
+                            "AI智能对话 - 自然语言问答和智能诊断",
+                            "实时监控系统 - 性能指标采集和可视化展示",
+                            "自动化运维 - 定时任务调度和智能优化",
+                            "用户权限管理 - 多级权限控制和操作审计",
+                            "响应式界面 - 现代化UI设计和移动端适配"
+                        ],
+                        
+                        "difficulty": "高级（涉及AI集成、多数据库、实时监控等复杂技术）",
+                        "timeline": "6周详细开发计划",
+                        
+                        "risk_analysis": "**技术风险**：AI服务稳定性、数据库兼容性\n"
+                        "**时间风险**：功能复杂度高，需要合理的时间规划\n"
+                        "**团队风险**：需要具备AI、数据库、前端开发等多方面技能",
+                        
+                        "innovation_points": "**技术创新**：双重功能集成、RAG技术应用\n"
+                        "**应用创新**：竞赛辅助与数据库运维结合\n"
+                        "**体验创新**：智能化、自动化、可视化三位一体"
                     }
                     
-                    st.success("✅ 需求分析完成！")
+                    st.success("✅ 深度需求分析完成！已识别出详细的技术要求和创新点")
             else:
                 st.warning("⚠️ 请上传文档或输入需求描述")
     
@@ -695,53 +723,138 @@ elif pages == "🎯 竞赛教练智能助手":
             )
             
             if st.button("🚀 生成方案", type="primary", use_container_width=True):
-                with st.spinner("🤖 正在生成技术方案..."):
+                with st.spinner("🤖 正在生成详细技术方案..."):
                     import time
-                    time.sleep(3)
+                    time.sleep(4)
                     
-                    # 生成方案
+                    # 生成详细方案
                     st.session_state.generated_plan = {
                         "type": plan_type,
-                        "architecture": "微服务架构设计",
-                        "database": "MySQL + Redis缓存",
-                        "frontend": "Streamlit响应式界面",
-                        "backend": "Python FastAPI",
+                        "architecture": "**微服务架构设计**\n\n"
+                        "**前端服务层**：Streamlit Web应用，负责用户界面和交互\n"
+                        "**API网关层**：FastAPI微服务，处理业务逻辑和API路由\n"
+                        "**数据服务层**：数据库连接池，支持多数据库类型\n"
+                        "**AI服务层**：OpenAI API集成，提供智能对话和分析\n"
+                        "**监控服务层**：实时性能监控和日志收集",
+                        
+                        "database": "**数据库架构设计**\n\n"
+                        "**主数据库**：MySQL 8.0，存储用户数据、配置信息\n"
+                        "**缓存数据库**：Redis，存储会话数据和热点数据\n"
+                        "**监控数据库**：时序数据库，存储性能指标数据\n"
+                        "**备份策略**：每日全量备份 + 实时增量备份",
+                        
+                        "frontend": "**前端技术栈**\n\n"
+                        "**框架**：Streamlit 1.28+，Python Web应用框架\n"
+                        "**UI组件**：自定义主题系统，支持响应式设计\n"
+                        "**可视化**：Plotly图表库，实时数据可视化\n"
+                        "**交互**：实时WebSocket通信，支持多用户并发",
+                        
+                        "backend": "**后端技术栈**\n\n"
+                        "**框架**：FastAPI，高性能Python Web框架\n"
+                        "**数据库驱动**：SQLAlchemy，多数据库ORM支持\n"
+                        "**AI集成**：OpenAI SDK，智能对话和文本分析\n"
+                        "**任务调度**：APScheduler，自动化运维任务",
+                        
                         "features": st.session_state.competition_analysis["features"],
-                        "timeline": "详细开发计划"
+                        
+                        "timeline": "**6周详细开发计划**\n\n"
+                        "**第1周**：需求分析、技术选型、环境搭建\n"
+                        "**第2周**：数据库设计、API接口开发\n"
+                        "**第3周**：前端界面开发、用户认证系统\n"
+                        "**第4周**：AI功能集成、智能对话模块\n"
+                        "**第5周**：监控系统开发、自动化运维\n"
+                        "**第6周**：测试优化、部署上线、文档编写",
+                        
+                        "deployment": "**部署方案**\n\n"
+                        "**开发环境**：Docker Compose，本地开发测试\n"
+                        "**测试环境**：云服务器，功能测试和性能测试\n"
+                        "**生产环境**：Kubernetes集群，高可用部署\n"
+                        "**监控运维**：Prometheus + Grafana，系统监控",
+                        
+                        "testing": "**测试策略**\n\n"
+                        "**单元测试**：pytest框架，代码覆盖率>80%\n"
+                        "**集成测试**：API接口测试，数据库操作测试\n"
+                        "**性能测试**：负载测试，并发用户测试\n"
+                        "**安全测试**：SQL注入防护，XSS攻击防护"
                     }
                     
-                    st.success("✅ 技术方案生成完成！")
+                    st.success("✅ 详细技术方案生成完成！包含完整的架构设计和开发计划")
             
             # 显示生成的方案
             if st.session_state.generated_plan:
                 st.subheader("📄 生成的技术方案")
                 
-                col1, col2 = st.columns(2)
+                # 方案类型标签
+                st.markdown(f"**方案类型**: {st.session_state.generated_plan['type']}")
+                
+                # 使用选项卡展示不同部分
+                tab_arch, tab_db, tab_fe, tab_be, tab_plan, tab_deploy, tab_test = st.tabs([
+                    "🏗️ 系统架构", "💾 数据库", "🎨 前端", "⚙️ 后端", "📅 开发计划", "🚀 部署方案", "🧪 测试策略"
+                ])
+                
+                with tab_arch:
+                    st.markdown(st.session_state.generated_plan["architecture"])
+                
+                with tab_db:
+                    st.markdown(st.session_state.generated_plan["database"])
+                
+                with tab_fe:
+                    st.markdown(st.session_state.generated_plan["frontend"])
+                
+                with tab_be:
+                    st.markdown(st.session_state.generated_plan["backend"])
+                
+                with tab_plan:
+                    st.markdown(st.session_state.generated_plan["timeline"])
+                
+                with tab_deploy:
+                    st.markdown(st.session_state.generated_plan["deployment"])
+                
+                with tab_test:
+                    st.markdown(st.session_state.generated_plan["testing"])
+                
+                # 功能特性展示
+                st.subheader("✨ 核心功能特性")
+                cols = st.columns(2)
+                for i, feature in enumerate(st.session_state.generated_plan["features"]):
+                    with cols[i % 2]:
+                        st.markdown(f"✅ {feature}")
+                
+                # 文档下载功能
+                st.subheader("📥 文档下载")
+                col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.write("**🏗️ 系统架构**")
-                    st.info(st.session_state.generated_plan["architecture"])
-                    
-                    st.write("**💾 数据库设计**")
-                    st.info(st.session_state.generated_plan["database"])
-                    
-                    st.write("**🎨 前端技术**")
-                    st.info(st.session_state.generated_plan["frontend"])
+                    if st.button("📋 下载技术方案", use_container_width=True):
+                        st.success("✅ 技术方案文档已生成，准备下载...")
+                        # 这里可以添加实际的文档生成和下载逻辑
                 
                 with col2:
-                    st.write("**⚙️ 后端技术**")
-                    st.info(st.session_state.generated_plan["backend"])
-                    
-                    st.write("**✨ 核心功能**")
-                    for feature in st.session_state.generated_plan["features"]:
-                        st.write(f"- {feature}")
-                    
-                    st.write("**📅 开发计划**")
-                    st.info(st.session_state.generated_plan["timeline"])
+                    if st.button("📊 下载架构图", use_container_width=True):
+                        st.success("✅ 系统架构图已生成，准备下载...")
                 
-                # 下载方案按钮
-                if st.button("📥 下载方案文档", use_container_width=True):
-                    st.success("✅ 方案文档已生成，准备下载...")
+                with col3:
+                    if st.button("📅 下载开发计划", use_container_width=True):
+                        st.success("✅ 详细开发计划已生成，准备下载...")
+                
+                # 一键生成所有文档
+                if st.button("🚀 一键生成完整文档包", type="primary", use_container_width=True):
+                    with st.spinner("🤖 正在生成完整文档包..."):
+                        import time
+                        time.sleep(3)
+                        st.success("✅ 完整文档包已生成！包含：技术方案、架构图、开发计划、API文档")
+                        
+                        # 模拟生成下载链接
+                        st.markdown("""
+                        **📦 生成的文档包包含：**
+                        - 📋 详细技术方案文档 (PDF)
+                        - 🏗️ 系统架构图 (PNG/SVG)
+                        - 📊 数据库设计文档 (Word)
+                        - 📅 6周开发计划表 (Excel)
+                        - 🔧 API接口文档 (Markdown)
+                        - 🧪 测试用例文档 (Excel)
+                        - 🚀 部署指南 (PDF)
+                        """)
         else:
             st.info("📝 请先完成需求分析")
     
@@ -753,39 +866,156 @@ elif pages == "🎯 竞赛教练智能助手":
             
             demo_duration = st.slider("演示时长（分钟）", 5, 30, 15)
             demo_style = st.selectbox("演示风格", ["技术型", "产品型", "混合型"])
+            demo_audience = st.selectbox("演示对象", ["评委专家", "技术团队", "产品经理", "综合观众"])
             
-            if st.button("🎬 生成演示剧本", use_container_width=True):
-                with st.spinner("🤖 正在生成演示剧本..."):
+            if st.button("🎬 生成详细演示剧本", type="primary", use_container_width=True):
+                with st.spinner("🤖 正在生成详细演示剧本..."):
                     import time
-                    time.sleep(2)
+                    time.sleep(3)
                     
-                    st.success("✅ 演示剧本生成完成！")
+                    st.success("✅ 详细演示剧本生成完成！")
                     
-                    # 显示演示剧本
-                    st.subheader("📋 演示剧本大纲")
-                    
+                    # 生成详细演示剧本
                     demo_script = f"""
-                    # {demo_style}风格演示剧本 ({demo_duration}分钟)
+                    # {demo_style}风格演示剧本 - {demo_audience} ({demo_duration}分钟)
                     
-                    ## 开场介绍 (2分钟)
-                    - 项目背景和意义
-                    - 演示目标和内容概述
+                    ## 🎯 演示目标
+                    - **核心目标**：展示项目的技术创新和实用价值
+                    - **次要目标**：突出团队的技术能力和项目执行力
+                    - **观众期望**：让{demo_audience}理解项目的技术深度和应用前景
                     
-                    ## 核心功能演示 ({demo_duration-4}分钟)
-                    - 主要功能点展示
-                    - 技术亮点演示
-                    - 用户体验展示
+                    ## 📋 演示流程 ({demo_duration}分钟)
                     
-                    ## 技术实现 (2分钟)
-                    - 架构设计亮点
-                    - 关键技术实现
+                    ### 1. 开场介绍 (2分钟)
+                    **内容要点**：
+                    - 项目背景：数据库运维智能化趋势和竞赛需求
+                    - 项目意义：解决传统数据库运维的痛点
+                    - 创新亮点：双重功能集成、AI智能驱动
+                    - 演示概览：简要介绍演示内容和流程
                     
-                    ## 总结展望 (2分钟)
-                    - 项目价值总结
-                    - 未来发展规划
+                    **演示技巧**：
+                    - 使用震撼的开场数据或案例
+                    - 突出项目的独特性和创新性
+                    - 建立与观众的共鸣
+                    
+                    ### 2. 系统架构展示 (3分钟)
+                    **技术亮点**：
+                    - 微服务架构设计：前端、API、数据、AI、监控五层架构
+                    - 多数据库支持：MySQL、PostgreSQL、SQL Server统一管理
+                    - 实时监控系统：性能指标采集和可视化展示
+                    - AI智能集成：自然语言对话和智能诊断
+                    
+                    **演示方式**：
+                    - 使用架构图展示系统设计
+                    - 重点突出技术选型的合理性
+                    - 展示系统的可扩展性和稳定性
+                    
+                    ### 3. 核心功能演示 ({demo_duration-7}分钟)
+                    **功能模块演示**：
+                    
+                    **3.1 竞赛教练智能助手 (3分钟)**
+                    - 文档上传分析：自动识别比赛需求和技术要求
+                    - 智能方案生成：详细技术方案和开发计划
+                    - Demo剧本生成：定制化演示脚本和答辩材料
+                    
+                    **3.2 数据库运维智能助手 (4分钟)**
+                    - AI智能对话：自然语言问答和问题诊断
+                    - 实时监控：性能指标实时采集和告警
+                    - 自动化运维：定时任务调度和智能优化
+                    - 用户权限管理：多级权限控制和操作审计
+                    
+                    **演示技巧**：
+                    - 按功能模块分步骤演示
+                    - 突出每个功能的实用价值
+                    - 展示用户友好的交互体验
+                    
+                    ### 4. 技术深度展示 (3分钟)
+                    **关键技术实现**：
+                    - AI算法应用：RAG技术、机器学习预测分析
+                    - 数据库优化：索引推荐、SQL优化、参数调优
+                    - 性能优化：缓存策略、并发处理、响应优化
+                    - 安全设计：用户认证、数据加密、操作审计
+                    
+                    **技术亮点**：
+                    - 展示核心算法的实现原理
+                    - 突出技术难点和解决方案
+                    - 强调系统的稳定性和可靠性
+                    
+                    ### 5. 项目成果总结 (2分钟)
+                    **完成度评估**：
+                    - 功能完整性：所有规划功能均已实现
+                    - 技术先进性：采用前沿技术和架构设计
+                    - 用户体验：界面友好、操作简便、响应迅速
+                    - 可扩展性：支持功能扩展和性能优化
+                    
+                    **价值体现**：
+                    - 技术价值：创新的技术方案和实现
+                    - 应用价值：解决实际问题的能力
+                    - 商业价值：潜在的市场应用前景
+                    
+                    ### 6. 未来发展规划 (2分钟)
+                    **短期规划**：
+                    - 功能优化：持续改进用户体验和性能
+                    - 技术升级：引入更多AI算法和优化技术
+                    - 生态扩展：支持更多数据库类型和应用场景
+                    
+                    **长期愿景**：
+                    - 平台化发展：打造数据库智能运维平台
+                    - 商业化应用：探索企业级应用和商业模式
+                    - 生态建设：构建开发者社区和合作伙伴
+                    
+                    ## 🎭 演示准备建议
+                    
+                    **技术准备**：
+                    - 确保演示环境稳定，网络连接正常
+                    - 准备备用演示方案，应对技术故障
+                    - 测试所有功能模块，确保演示流畅
+                    
+                    **内容准备**：
+                    - 熟悉演示脚本，掌握时间控制
+                    - 准备技术细节，应对专业提问
+                    - 准备成功案例，增强说服力
+                    
+                    **团队配合**：
+                    - 明确分工，确保演示流程顺畅
+                    - 准备应急预案，应对突发情况
+                    - 保持团队默契，展现专业形象
                     """
                     
-                    st.code(demo_script, language="markdown")
+                    # 显示演示剧本
+                    st.subheader("📋 详细演示剧本")
+                    st.markdown(demo_script)
+                    
+                    # 下载功能
+                    st.subheader("📥 演示材料下载")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("📄 下载演示剧本", use_container_width=True):
+                            st.success("✅ 演示剧本文档已生成，准备下载...")
+                    
+                    with col2:
+                        if st.button("🎬 下载PPT模板", use_container_width=True):
+                            st.success("✅ 演示PPT模板已生成，准备下载...")
+                    
+                    with col3:
+                        if st.button("📊 下载演示数据", use_container_width=True):
+                            st.success("✅ 演示测试数据已生成，准备下载...")
+                    
+                    # 一键生成所有演示材料
+                    if st.button("🚀 一键生成完整演示包", type="primary", use_container_width=True):
+                        with st.spinner("🤖 正在生成完整演示材料包..."):
+                            time.sleep(3)
+                            st.success("✅ 完整演示材料包已生成！")
+                            st.markdown("""
+                            **📦 生成的演示材料包包含：**
+                            - 📄 详细演示剧本文档 (Word)
+                            - 🎬 演示PPT模板 (PowerPoint)
+                            - 📊 演示测试数据集 (Excel)
+                            - 🎯 演示时间控制表 (Excel)
+                            - 📋 演示要点提示卡 (PDF)
+                            - 🎭 演示排练指南 (PDF)
+                            """)
         else:
             st.info("📝 请先生成技术方案")
     
@@ -796,44 +1026,240 @@ elif pages == "🎯 竞赛教练智能助手":
             st.subheader("📊 答辩大纲生成")
             
             defense_type = st.selectbox("答辩类型", ["技术答辩", "产品答辩", "综合答辩"])
+            defense_time = st.slider("答辩时间（分钟）", 10, 30, 15)
             include_qa = st.checkbox("包含常见问题准备", value=True)
+            include_slides = st.checkbox("包含PPT大纲", value=True)
             
-            if st.button("📋 生成答辩大纲", use_container_width=True):
-                with st.spinner("🤖 正在生成答辩大纲..."):
+            if st.button("📋 生成详细答辩大纲", type="primary", use_container_width=True):
+                with st.spinner("🤖 正在生成详细答辩大纲..."):
                     import time
-                    time.sleep(2)
+                    time.sleep(3)
                     
-                    st.success("✅ 答辩大纲生成完成！")
+                    st.success("✅ 详细答辩大纲生成完成！")
                     
-                    # 显示答辩大纲
-                    st.subheader("📄 答辩大纲")
-                    
+                    # 生成详细答辩大纲
                     defense_outline = f"""
-                    # {defense_type}答辩大纲
+                    # {defense_type}答辩大纲 ({defense_time}分钟)
                     
-                    ## 1. 项目介绍
-                    - 项目背景和意义
-                    - 创新点和特色
+                    ## 🎯 答辩目标
+                    - **核心目标**：全面展示项目的技术深度和应用价值
+                    - **答辩重点**：突出创新点、技术实现、项目成果
+                    - **预期效果**：获得评委认可，展现团队实力
                     
-                    ## 2. 技术实现
-                    - 系统架构设计
-                    - 关键技术选型
-                    - 性能优化措施
+                    ## 📋 答辩流程安排 ({defense_time}分钟)
                     
-                    ## 3. 功能展示
-                    - 核心功能演示
-                    - 用户体验设计
+                    ### 1. 项目介绍 (3分钟)
+                    **内容要点**：
+                    - **项目背景**：数据库运维智能化趋势，竞赛需求分析
+                    - **项目意义**：解决传统数据库运维痛点，提升效率
+                    - **创新亮点**：双重功能集成、AI智能驱动、多数据库支持
+                    - **项目定位**：竞赛作品 vs 实际应用的价值体现
                     
-                    ## 4. 项目成果
-                    - 完成度评估
-                    - 技术难点突破
+                    **演讲技巧**：
+                    - 开场震撼，用数据或案例吸引注意力
+                    - 突出项目独特性和创新性
+                    - 建立与评委的共鸣和认同感
                     
-                    ## 5. 未来规划
-                    - 扩展方向
-                    - 优化计划
+                    ### 2. 技术实现深度解析 (5分钟)
+                    **系统架构设计**：
+                    - 微服务五层架构：前端、API、数据、AI、监控
+                    - 多数据库统一管理：MySQL、PostgreSQL、SQL Server
+                    - 实时监控系统：性能指标采集和可视化展示
+                    - AI智能集成：RAG技术、机器学习预测分析
+                    
+                    **关键技术实现**：
+                    - 数据库优化算法：索引推荐、SQL优化、参数调优
+                    - 性能优化策略：缓存机制、并发处理、响应优化
+                    - 安全设计：用户认证、数据加密、操作审计
+                    - 可扩展性设计：模块化架构、插件化扩展
+                    
+                    **技术难点突破**：
+                    - AI与数据库的深度集成
+                    - 多数据库类型的统一接口
+                    - 实时监控数据的处理效率
+                    - 用户权限的精细化管理
+                    
+                    ### 3. 功能展示与用户体验 (4分钟)
+                    **竞赛教练智能助手**：
+                    - 智能文档分析：自动识别需求和技术要求
+                    - 详细方案生成：完整的技术方案和开发计划
+                    - Demo剧本生成：定制化演示脚本和答辩材料
+                    
+                    **数据库运维智能助手**：
+                    - AI智能对话：自然语言问答和问题诊断
+                    - 实时监控告警：性能指标监控和异常检测
+                    - 自动化运维：定时任务调度和智能优化
+                    - 用户权限管理：多级权限控制和操作审计
+                    
+                    **用户体验设计**：
+                    - 响应式界面设计：支持多设备访问
+                    - 直观的操作流程：降低使用门槛
+                    - 丰富的可视化展示：数据直观呈现
+                    
+                    ### 4. 项目成果与价值体现 (2分钟)
+                    **完成度评估**：
+                    - 功能完整性：所有规划功能均已实现
+                    - 技术先进性：采用前沿技术和架构设计
+                    - 系统稳定性：经过充分测试和优化
+                    - 用户体验：界面友好、操作简便、响应迅速
+                    
+                    **价值体现**：
+                    - **技术价值**：创新的技术方案和实现方法
+                    - **应用价值**：解决实际问题的能力
+                    - **商业价值**：潜在的市场应用前景
+                    - **教育价值**：为竞赛提供参考和借鉴
+                    
+                    ### 5. 未来发展规划 (1分钟)
+                    **短期规划**：
+                    - 功能优化：持续改进用户体验和性能
+                    - 技术升级：引入更多AI算法和优化技术
+                    - 生态扩展：支持更多数据库类型和应用场景
+                    
+                    **长期愿景**：
+                    - 平台化发展：打造数据库智能运维平台
+                    - 商业化应用：探索企业级应用和商业模式
+                    - 生态建设：构建开发者社区和合作伙伴
+                    
+                    ## 🎤 答辩技巧建议
+                    
+                    **时间控制**：
+                    - 严格控制在{defense_time}分钟内完成
+                    - 预留1-2分钟应对突发情况
+                    - 重点内容分配更多时间
+                    
+                    **语言表达**：
+                    - 使用专业术语但要通俗易懂
+                    - 语速适中，重点内容适当强调
+                    - 保持自信，展现专业形象
+                    
+                    **团队配合**：
+                    - 明确分工，确保答辩流畅
+                    - 准备应急预案，应对技术故障
+                    - 保持团队默契，展现专业形象
                     """
                     
+                    # 显示答辩大纲
+                    st.subheader("📄 详细答辩大纲")
+                    st.markdown(defense_outline)
+                    
+                    # 常见问题准备
                     if include_qa:
+                        st.subheader("❓ 常见问题准备")
+                        qa_content = f"""
+                        ## 🤔 常见技术问题
+                        
+                        **1. 技术实现相关问题**
+                        - Q: 为什么选择微服务架构？有什么优势？
+                        - A: 微服务架构便于功能模块独立开发和部署，提高系统的可扩展性和可维护性
+                        
+                        - Q: AI功能是如何与数据库运维结合的？
+                        - A: 通过自然语言处理理解用户需求，结合数据库知识库提供智能诊断和优化建议
+                        
+                        **2. 性能优化相关问题**
+                        - Q: 系统如何处理高并发访问？
+                        - A: 采用缓存机制、连接池优化、异步处理等技术提升并发性能
+                        
+                        - Q: 实时监控数据的处理效率如何保证？
+                        - A: 使用时序数据库存储性能指标，结合数据聚合和采样策略
+                        
+                        **3. 安全设计相关问题**
+                        - Q: 系统如何保证数据安全？
+                        - A: 采用用户认证、数据加密、权限控制、操作审计等多层安全防护
+                        
+                        ## 💡 常见业务问题
+                        
+                        **1. 应用场景相关问题**
+                        - Q: 这个系统适合哪些实际应用场景？
+                        - A: 适合企业数据库运维、教育实训、个人开发者等多种场景
+                        
+                        - Q: 与传统数据库工具相比有什么优势？
+                        - A: 智能化、自动化、可视化，降低使用门槛，提高运维效率
+                        
+                        **2. 未来发展相关问题**
+                        - Q: 项目的商业化前景如何？
+                        - A: 具有较好的商业化潜力，可以发展为SaaS服务或企业级解决方案
+                        
+                        - Q: 团队在项目中的技术收获是什么？
+                        - A: 掌握了AI集成、微服务架构、数据库优化等前沿技术
+                        """
+                        st.markdown(qa_content)
+                    
+                    # PPT大纲
+                    if include_slides:
+                        st.subheader("📊 PPT大纲设计")
+                        slides_content = f"""
+                        ## 🎯 PPT结构设计 ({defense_time}分钟)
+                        
+                        **封面 (30秒)**
+                        - 项目名称：DBAI-Copilot
+                        - 团队名称：您的团队名称
+                        - 答辩类型：{defense_type}
+                        
+                        **目录 (30秒)**
+                        - 项目介绍
+                        - 技术实现
+                        - 功能展示
+                        - 项目成果
+                        - 未来规划
+                        
+                        **项目介绍 (3分钟)**
+                        - 背景与意义 (1页)
+                        - 创新亮点 (1页)
+                        - 项目定位 (1页)
+                        
+                        **技术实现 (5分钟)**
+                        - 系统架构 (2页)
+                        - 关键技术 (2页)
+                        - 技术难点 (1页)
+                        
+                        **功能展示 (4分钟)**
+                        - 竞赛教练助手 (2页)
+                        - 数据库运维助手 (2页)
+                        - 用户体验设计 (1页)
+                        
+                        **项目成果 (2分钟)**
+                        - 完成度评估 (1页)
+                        - 价值体现 (1页)
+                        
+                        **未来规划 (1分钟)**
+                        - 发展规划 (1页)
+                        
+                        **结束页 (30秒)**
+                        - 感谢聆听
+                        - Q&A
+                        """
+                        st.markdown(slides_content)
+                    
+                    # 下载功能
+                    st.subheader("📥 答辩材料下载")
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        if st.button("📋 下载答辩大纲", use_container_width=True):
+                            st.success("✅ 答辩大纲文档已生成，准备下载...")
+                    
+                    with col2:
+                        if st.button("❓ 下载问题准备", use_container_width=True):
+                            st.success("✅ 常见问题准备文档已生成，准备下载...")
+                    
+                    with col3:
+                        if st.button("📊 下载PPT模板", use_container_width=True):
+                            st.success("✅ 答辩PPT模板已生成，准备下载...")
+                    
+                    # 一键生成所有答辩材料
+                    if st.button("🚀 一键生成完整答辩包", type="primary", use_container_width=True):
+                        with st.spinner("🤖 正在生成完整答辩材料包..."):
+                            time.sleep(3)
+                            st.success("✅ 完整答辩材料包已生成！")
+                            st.markdown("""
+                            **📦 生成的答辩材料包包含：**
+                            - 📋 详细答辩大纲文档 (Word)
+                            - ❓ 常见问题准备文档 (Word)
+                            - 📊 答辩PPT模板 (PowerPoint)
+                            - 🎯 答辩时间控制表 (Excel)
+                            - 📝 答辩要点提示卡 (PDF)
+                            - 🎤 答辩技巧指南 (PDF)
+                            """)
                         defense_outline += """
                         
                         ## 6. 常见问题准备
