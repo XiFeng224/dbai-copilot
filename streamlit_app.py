@@ -1500,122 +1500,117 @@ elif pages == "🎯 竞赛教练智能助手":
             demo_audience = st.selectbox("演示对象", ["评委专家", "技术团队", "产品经理", "综合观众"])
             
             if st.button("🎬 生成详细演示剧本", type="primary", use_container_width=True):
-                with st.spinner("🤖 正在生成详细演示剧本..."):
-                    import time
-                    time.sleep(3)
-                    
-                    st.success("✅ 详细演示剧本生成完成！")
-                    
-                    # 生成详细演示剧本
-                    demo_script = f"""
-                    # {demo_style}风格演示剧本 - {demo_audience} ({demo_duration}分钟)
-                    
-                    ## 🎯 演示目标
-                    - **核心目标**：展示项目的技术创新和实用价值
-                    - **次要目标**：突出团队的技术能力和项目执行力
-                    - **观众期望**：让{demo_audience}理解项目的技术深度和应用前景
-                    
-                    ## 📋 演示流程 ({demo_duration}分钟)
-                    
-                    ### 1. 开场介绍 (2分钟)
-                    **内容要点**：
-                    - 项目背景：数据库运维智能化趋势和竞赛需求
-                    - 项目意义：解决传统数据库运维的痛点
-                    - 创新亮点：双重功能集成、AI智能驱动
-                    - 演示概览：简要介绍演示内容和流程
-                    
-                    **演示技巧**：
-                    - 使用震撼的开场数据或案例
-                    - 突出项目的独特性和创新性
-                    - 建立与观众的共鸣
-                    
-                    ### 2. 系统架构展示 (3分钟)
-                    **技术亮点**：
-                    - 微服务架构设计：前端、API、数据、AI、监控五层架构
-                    - 多数据库支持：MySQL、PostgreSQL、SQL Server统一管理
-                    - 实时监控系统：性能指标采集和可视化展示
-                    - AI智能集成：自然语言对话和智能诊断
-                    
-                    **演示方式**：
-                    - 使用架构图展示系统设计
-                    - 重点突出技术选型的合理性
-                    - 展示系统的可扩展性和稳定性
-                    
-                    ### 3. 核心功能演示 ({demo_duration-7}分钟)
-                    **功能模块演示**：
-                    
-                    **3.1 竞赛教练智能助手 (3分钟)**
-                    - 文档上传分析：自动识别比赛需求和技术要求
-                    - 智能方案生成：详细技术方案和开发计划
-                    - Demo剧本生成：定制化演示脚本和答辩材料
-                    
-                    **3.2 数据库运维智能助手 (4分钟)**
-                    - AI智能对话：自然语言问答和问题诊断
-                    - 实时监控：性能指标实时采集和告警
-                    - 自动化运维：定时任务调度和智能优化
-                    - 用户权限管理：多级权限控制和操作审计
-                    
-                    **演示技巧**：
-                    - 按功能模块分步骤演示
-                    - 突出每个功能的实用价值
-                    - 展示用户友好的交互体验
-                    
-                    ### 4. 技术深度展示 (3分钟)
-                    **关键技术实现**：
-                    - AI算法应用：RAG技术、机器学习预测分析
-                    - 数据库优化：索引推荐、SQL优化、参数调优
-                    - 性能优化：缓存策略、并发处理、响应优化
-                    - 安全设计：用户认证、数据加密、操作审计
-                    
-                    **技术亮点**：
-                    - 展示核心算法的实现原理
-                    - 突出技术难点和解决方案
-                    - 强调系统的稳定性和可靠性
-                    
-                    ### 5. 项目成果总结 (2分钟)
-                    **完成度评估**：
-                    - 功能完整性：所有规划功能均已实现
-                    - 技术先进性：采用前沿技术和架构设计
-                    - 用户体验：界面友好、操作简便、响应迅速
-                    - 可扩展性：支持功能扩展和性能优化
-                    
-                    **价值体现**：
-                    - 技术价值：创新的技术方案和实现
-                    - 应用价值：解决实际问题的能力
-                    - 商业价值：潜在的市场应用前景
-                    
-                    ### 6. 未来发展规划 (2分钟)
-                    **短期规划**：
-                    - 功能优化：持续改进用户体验和性能
-                    - 技术升级：引入更多AI算法和优化技术
-                    - 生态扩展：支持更多数据库类型和应用场景
-                    
-                    **长期愿景**：
-                    - 平台化发展：打造数据库智能运维平台
-                    - 商业化应用：探索企业级应用和商业模式
-                    - 生态建设：构建开发者社区和合作伙伴
-                    
-                    ## 🎭 演示准备建议
-                    
-                    **技术准备**：
-                    - 确保演示环境稳定，网络连接正常
-                    - 准备备用演示方案，应对技术故障
-                    - 测试所有功能模块，确保演示流畅
-                    
-                    **内容准备**：
-                    - 熟悉演示脚本，掌握时间控制
-                    - 准备技术细节，应对专业提问
-                    - 准备成功案例，增强说服力
-                    
-                    **团队配合**：
-                    - 明确分工，确保演示流程顺畅
-                    - 准备应急预案，应对突发情况
-                    - 保持团队默契，展现专业形象
-                    """
-                    
-                    # 显示演示剧本
-                    st.subheader("📋 详细演示剧本")
-                    st.markdown(demo_script)
+                with st.spinner("🤖 AI正在生成详细演示剧本..."):
+                    try:
+                        # 构建Demo剧本生成提示词
+                        demo_prompt = f"""
+                        请作为专业的计算机设计大赛演示教练，为参赛团队生成一份{demo_style}风格的演示剧本。
+                        
+                        项目信息：
+                        - 项目名称：DB-AI Copilot - 智能数据库运维与竞赛辅助系统
+                        - 核心功能：竞赛教练智能助手 + 数据库运维智能助手
+                        
+                        演示要求：
+                        - 演示时长：{demo_duration}分钟
+                        - 演示风格：{demo_style}
+                        - 演示对象：{demo_audience}
+                        
+                        请生成一份完整的演示剧本，包含以下内容：
+                        
+                        ## 1. 🎯 演示目标
+                        - 核心目标和次要目标
+                        - 针对{demo_audience}的关注点设计
+                        
+                        ## 2. 📋 详细演示流程
+                        按时间分段设计，总时长{demo_duration}分钟：
+                        - 开场介绍
+                        - 系统架构展示
+                        - 核心功能演示（竞赛教练和数据库运维）
+                        - 技术亮点展示
+                        - 项目成果总结
+                        - 未来规划
+                        
+                        ## 3. 🎬 每个环节的具体内容
+                        - 要说的话
+                        - 要演示的操作
+                        - 时间控制
+                        - 演示技巧
+                        
+                        ## 4. 🎭 演示准备清单
+                        - 技术准备
+                        - 内容准备
+                        - 团队配合
+                        
+                        请提供具体、详细、可操作的演示剧本，帮助团队在比赛中取得好成绩。
+                        """
+                        
+                        # 调用真实LLM生成Demo剧本
+                        from app.llm import invoke_llm
+                        demo_script = invoke_llm(demo_prompt)
+                        
+                        st.success("✅ AI演示剧本生成完成！")
+                        
+                        # 保存Demo剧本
+                        if "demo_script" not in st.session_state:
+                            st.session_state.demo_script = {}
+                        st.session_state.demo_script = {
+                            "content": demo_script,
+                            "duration": demo_duration,
+                            "style": demo_style,
+                            "audience": demo_audience
+                        }
+                        
+                        # 显示Demo剧本
+                        st.subheader("📋 详细演示剧本")
+                        st.markdown(demo_script)
+                        
+                    except Exception as e:
+                        st.error(f"Demo剧本生成失败: {str(e)}")
+                        st.info("使用备用Demo剧本...")
+                        
+                        # 备用Demo剧本
+                        backup_demo = f"""
+                        # {demo_style}风格演示剧本 - {demo_audience} ({demo_duration}分钟)
+                        
+                        ## 🎯 演示目标
+                        - 展示项目的技术创新和实用价值
+                        - 突出团队的技术能力和项目执行力
+                        - 让{demo_audience}理解项目的技术深度
+                        
+                        ## 📋 演示流程 ({demo_duration}分钟)
+                        
+                        ### 1. 开场介绍 (2分钟)
+                        - 项目背景和意义
+                        - 创新亮点：双重功能集成、AI智能驱动
+                        
+                        ### 2. 系统架构 (3分钟)
+                        - 五层微服务架构
+                        - 多数据库支持
+                        - AI智能集成
+                        
+                        ### 3. 核心功能 ({demo_duration-7}分钟)
+                        - 竞赛教练智能助手
+                        - 数据库运维智能助手
+                        
+                        ### 4. 技术亮点 (2分钟)
+                        - RAG技术应用
+                        - 数据库智能优化
+                        
+                        ### 5. 总结 (2分钟)
+                        - 项目成果
+                        - 未来规划
+                        """
+                        
+                        st.session_state.demo_script = {
+                            "content": backup_demo,
+                            "duration": demo_duration,
+                            "style": demo_style,
+                            "audience": demo_audience
+                        }
+                        
+                        st.success("✅ 备用Demo剧本生成完成！")
+                        st.subheader("📋 演示剧本")
+                        st.markdown(backup_demo)
                     
                     # 下载功能
                     st.subheader("📥 演示材料下载")
@@ -1662,15 +1657,82 @@ elif pages == "🎯 竞赛教练智能助手":
             include_slides = st.checkbox("包含PPT大纲", value=True)
             
             if st.button("📋 生成详细答辩大纲", type="primary", use_container_width=True):
-                with st.spinner("🤖 正在生成详细答辩大纲..."):
-                    import time
-                    time.sleep(3)
-                    
-                    st.success("✅ 详细答辩大纲生成完成！")
-                    
-                    # 生成详细答辩大纲
-                    defense_outline = f"""
-                    # {defense_type}答辩大纲 ({defense_time}分钟)
+                with st.spinner("🤖 AI正在生成详细答辩大纲..."):
+                    try:
+                        # 构建答辩大纲生成提示词
+                        defense_prompt = f"""
+                        请作为专业的计算机设计大赛答辩教练，为参赛团队生成一份{defense_type}答辩大纲。
+                        
+                        项目信息：
+                        - 项目名称：DB-AI Copilot - 智能数据库运维与竞赛辅助系统
+                        - 核心功能：竞赛教练智能助手 + 数据库运维智能助手
+                        
+                        答辩要求：
+                        - 答辩类型：{defense_type}
+                        - 答辩时间：{defense_time}分钟
+                        - 包含常见问题：{'是' if include_qa else '否'}
+                        - 包含PPT大纲：{'是' if include_slides else '否'}
+                        
+                        请生成一份完整的答辩大纲，包含以下内容：
+                        
+                        ## 1. 🎯 答辩目标
+                        - 核心目标和预期效果
+                        - 答辩重点和策略
+                        
+                        ## 2. 📋 详细答辩流程
+                        按时间分段设计，总时长{defense_time}分钟：
+                        - 项目介绍
+                        - 技术实现解析
+                        - 功能展示
+                        - 项目成果
+                        - 未来规划
+                        
+                        ## 3. 🎤 每个环节的内容要点
+                        - 要说的内容
+                        - 时间控制
+                        - 演讲技巧
+                        
+                        ## 4. ❓ 常见问题准备
+                        - 技术问题及答案
+                        - 业务问题及答案
+                        - 评委可能问的问题
+                        
+                        ## 5. 📊 PPT大纲设计
+                        - PPT页数和每页内容
+                        - 重点突出的内容
+                        - 视觉设计建议
+                        
+                        请提供具体、详细、可操作的答辩大纲，帮助团队在比赛中取得好成绩。
+                        """
+                        
+                        # 调用真实LLM生成答辩大纲
+                        from app.llm import invoke_llm
+                        defense_outline = invoke_llm(defense_prompt)
+                        
+                        st.success("✅ AI答辩大纲生成完成！")
+                        
+                        # 保存答辩大纲
+                        if "defense_outline" not in st.session_state:
+                            st.session_state.defense_outline = {}
+                        st.session_state.defense_outline = {
+                            "content": defense_outline,
+                            "type": defense_type,
+                            "time": defense_time,
+                            "include_qa": include_qa,
+                            "include_slides": include_slides
+                        }
+                        
+                        # 显示答辩大纲
+                        st.subheader("📄 详细答辩大纲")
+                        st.markdown(defense_outline)
+                        
+                    except Exception as e:
+                        st.error(f"答辩大纲生成失败: {str(e)}")
+                        st.info("使用备用答辩大纲...")
+                        
+                        # 备用答辩大纲
+                        backup_defense = f"""
+                        # {defense_type}答辩大纲 ({defense_time}分钟)
                     
                     ## 🎯 答辩目标
                     - **核心目标**：全面展示项目的技术深度和应用价值
