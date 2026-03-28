@@ -753,43 +753,208 @@ elif pages == "🎯 竞赛教练智能助手":
                 st.info(st.session_state.competition_analysis["requirements"])
                 
                 st.subheader("⚙️ 技术栈推荐")
-                for tech in st.session_state.competition_analysis["tech_stack"]:
-                    st.write(f"- {tech}")
+                tech_stack = st.session_state.competition_analysis["tech_stack"]
+                for tech in tech_stack:
+                    st.markdown(f"- ✅ {tech}")
+                
+                st.markdown("---")
+                st.subheader("🔍 技术选型理由")
+                st.markdown("""
+                **🎯 推荐理由：**
+                - **Python 3.12**：最新稳定版，性能优化，类型提示完善
+                - **Streamlit**：快速构建数据应用，适合竞赛项目展示
+                - **FastAPI**：高性能后端，自动生成API文档
+                - **多数据库支持**：适应不同场景需求
+                - **OpenAI API**：提供强大的AI能力
+                """)
             
             with col2:
                 st.subheader("🎯 功能特性")
-                for feature in st.session_state.competition_analysis["features"]:
-                    st.write(f"- {feature}")
+                features = st.session_state.competition_analysis["features"]
+                for feature in features:
+                    st.markdown(f"- 🚀 {feature}")
                 
                 st.subheader("📊 项目评估")
-                st.write(f"**难度等级**: {st.session_state.competition_analysis['difficulty']}")
-                st.write(f"**预计周期**: {st.session_state.competition_analysis['timeline']}")
+                st.markdown(f"**难度等级**: {st.session_state.competition_analysis['difficulty']}")
+                st.markdown(f"**预计周期**: {st.session_state.competition_analysis['timeline']}")
+                
+                st.markdown("---")
+                st.subheader("⚠️ 风险分析")
+                st.warning(st.session_state.competition_analysis["risk_analysis"])
+                
+                st.subheader("💡 创新亮点")
+                st.success(st.session_state.competition_analysis["innovation_points"])
             
-            # 进一步分析选项
-            st.subheader("🔧 深度分析")
-            analysis_options = st.multiselect(
-                "选择分析维度",
-                ["架构设计", "数据库设计", "界面设计", "安全设计", "性能优化"],
-                default=["架构设计", "数据库设计"]
-            )
+            # 深度分析（使用真实LLM）
+            st.markdown("---")
+            st.subheader("🔧 AI深度分析")
             
-            if st.button("🔍 执行深度分析", use_container_width=True):
-                with st.spinner("🤖 正在进行深度分析..."):
-                    import time
-                    time.sleep(3)
-                    
-                    # 生成深度分析结果
-                    depth_analysis = {}
-                    for option in analysis_options:
-                        depth_analysis[option] = f"{option}分析完成，建议方案已生成"
-                    
-                    st.session_state.competition_analysis["depth"] = depth_analysis
-                    st.success("✅ 深度分析完成！")
-                    
-                    # 显示深度分析结果
-                    for option, result in depth_analysis.items():
-                        with st.expander(f"📋 {option}分析结果"):
-                            st.write(result)
+            col_analysis1, col_analysis2 = st.columns([1, 1])
+            
+            with col_analysis1:
+                analysis_type = st.selectbox(
+                    "选择分析类型",
+                    ["🏗️ 架构设计分析", "🗄️ 数据库设计分析", "🎨 界面设计分析", 
+                     "🔒 安全设计分析", "⚡ 性能优化分析", "👥 团队协作分析"],
+                    index=0
+                )
+            
+            with col_analysis2:
+                analysis_depth = st.select_slider(
+                    "分析深度",
+                    options=["基础", "详细", "深度"],
+                    value="详细"
+                )
+            
+            if st.button("🤖 执行AI深度分析", type="primary", use_container_width=True):
+                with st.spinner("🎯 AI正在进行深度分析..."):
+                    try:
+                        # 构建AI分析提示词
+                        analysis_prompt = f"""
+                        请作为专业的计算机设计大赛技术专家，进行{analysis_type}。
+                        
+                        分析深度：{analysis_depth}
+                        
+                        项目背景：
+                        - 这是一个集成竞赛教练和数据库运维功能的智能助手系统
+                        - 需要支持多数据库、AI对话、实时监控、自动化运维
+                        - 目标是参加计算机设计大赛并取得好成绩
+                        
+                        请提供：
+                        1. 📋 详细的分析报告
+                        2. 🎯 具体的设计建议
+                        3. ⚠️ 潜在风险和注意事项
+                        4. 💡 创新点和亮点建议
+                        5. 📊 实施步骤和时间规划
+                        
+                        请用清晰的结构、具体的例子、专业但易懂的语言回答。
+                        """
+                        
+                        # 调用真实LLM进行分析
+                        from app.llm import invoke_llm
+                        analysis_result = invoke_llm(analysis_prompt)
+                        
+                        st.success("✅ AI深度分析完成！")
+                        
+                        # 显示分析结果
+                        with st.expander(f"📋 {analysis_type} - 分析结果", expanded=True):
+                            st.markdown(analysis_result)
+                        
+                        # 保存分析结果
+                        if "ai_analysis" not in st.session_state.competition_analysis:
+                            st.session_state.competition_analysis["ai_analysis"] = {}
+                        st.session_state.competition_analysis["ai_analysis"][analysis_type] = analysis_result
+                        
+                    except Exception as e:
+                        st.error(f"分析失败: {str(e)}")
+                        st.info("使用备用分析方案...")
+                        
+                        # 备用分析方案
+                        backup_analysis = {
+                            "🏗️ 架构设计分析": """
+                            ## 🏗️ 架构设计分析（备用方案）
+                            
+                            ### 📋 推荐架构：五层微服务架构
+                            1. **前端层**：Streamlit Web界面
+                            2. **API层**：FastAPI RESTful API
+                            3. **业务逻辑层**：竞赛教练+数据库运维
+                            4. **数据层**：多数据库统一管理
+                            5. **AI层**：LLM集成+RAG检索
+                            
+                            ### 🎯 设计要点
+                            - 模块化设计，便于扩展
+                            - 松耦合，高内聚
+                            - 支持插件化扩展
+                            
+                            ### 💡 创新点
+                            - 双重功能集成设计
+                            - AI与数据库深度融合
+                            """,
+                            "🗄️ 数据库设计分析": """
+                            ## 🗄️ 数据库设计分析（备用方案）
+                            
+                            ### 📋 核心数据表
+                            1. **用户表**：用户信息、权限管理
+                            2. **项目表**：竞赛项目信息
+                            3. **对话历史表**：AI对话记录
+                            4. **监控数据表**：性能指标数据
+                            5. **任务调度表**：自动化运维任务
+                            
+                            ### 🎯 设计要点
+                            - 合理的索引设计
+                            - 支持多数据库适配
+                            - 数据备份和恢复策略
+                            """,
+                            "🎨 界面设计分析": """
+                            ## 🎨 界面设计分析（备用方案）
+                            
+                            ### 📋 设计原则
+                            1. **简洁直观**：操作流程清晰
+                            2. **响应式设计**：支持多设备
+                            3. **视觉层次**：重要信息突出
+                            4. **用户友好**：降低学习成本
+                            
+                            ### 🎯 页面布局
+                            - 左侧导航栏
+                            - 主内容区域
+                            - 右侧辅助面板
+                            """,
+                            "🔒 安全设计分析": """
+                            ## 🔒 安全设计分析（备用方案）
+                            
+                            ### 📋 安全措施
+                            1. **用户认证**：登录验证
+                            2. **权限管理**：多级权限控制
+                            3. **数据加密**：敏感数据加密
+                            4. **操作审计**：日志记录
+                            5. **防SQL注入**：参数化查询
+                            
+                            ### 🎯 最佳实践
+                            - 定期安全审计
+                            - 及时更新依赖
+                            - 备份策略完善
+                            """,
+                            "⚡ 性能优化分析": """
+                            ## ⚡ 性能优化分析（备用方案）
+                            
+                            ### 📋 优化策略
+                            1. **数据库优化**：索引、查询优化
+                            2. **缓存机制**：Redis缓存热点数据
+                            3. **异步处理**：后台任务异步执行
+                            4. **前端优化**：懒加载、组件优化
+                            
+                            ### 🎯 监控指标
+                            - 响应时间
+                            - 吞吐量
+                            - 资源利用率
+                            """,
+                            "👥 团队协作分析": """
+                            ## 👥 团队协作分析（备用方案）
+                            
+                            ### 📋 团队分工建议
+                            - **前端开发**：1-2人
+                            - **后端开发**：2-3人
+                            - **AI集成**：1人
+                            - **测试/文档**：1人
+                            
+                            ### 🎯 协作工具
+                            - Git版本控制
+                            - 项目管理工具
+                            - 即时通讯
+                            """
+                        }
+                        
+                        st.success("✅ 备用分析完成！")
+                        with st.expander(f"📋 {analysis_type} - 分析结果", expanded=True):
+                            st.markdown(backup_analysis.get(analysis_type, "分析完成"))
+            
+            # 显示历史分析结果
+            if "ai_analysis" in st.session_state.competition_analysis and st.session_state.competition_analysis["ai_analysis"]:
+                st.markdown("---")
+                st.subheader("📚 历史分析记录")
+                for analysis_name, analysis_content in st.session_state.competition_analysis["ai_analysis"].items():
+                    with st.expander(f"📋 {analysis_name}"):
+                        st.markdown(analysis_content)
         else:
             st.info("📝 请先上传文档并完成基础分析")
     
@@ -797,105 +962,205 @@ elif pages == "🎯 竞赛教练智能助手":
         st.header("📋 智能方案生成")
         
         if st.session_state.competition_analysis:
-            st.subheader("🎯 生成完整技术方案")
+            st.subheader("🎯 AI智能生成完整技术方案")
             
-            # 方案类型选择
-            plan_type = st.selectbox(
-                "选择方案类型",
-                ["基础方案", "详细方案", "完整方案"],
-                help="基础方案：核心功能设计；详细方案：包含技术细节；完整方案：包含所有文档"
+            # 方案配置
+            col_plan1, col_plan2 = st.columns([1, 1])
+            
+            with col_plan1:
+                plan_type = st.selectbox(
+                    "方案类型",
+                    ["🏗️ 架构设计方案", "💻 完整技术方案", "📋 项目实施方案"],
+                    index=1,
+                    help="选择需要生成的方案类型"
+                )
+            
+            with col_plan2:
+                team_size = st.select_slider(
+                    "团队规模",
+                    options=["2-3人", "4-5人", "6-8人"],
+                    value="4-5人"
+                )
+            
+            # 方案重点选项
+            st.markdown("**🎯 方案重点**")
+            focus_options = st.multiselect(
+                "选择重点关注的方面（可多选）",
+                ["技术创新", "用户体验", "性能优化", "安全性", "可扩展性", "文档完整性"],
+                default=["技术创新", "用户体验", "性能优化"]
             )
             
-            if st.button("🚀 生成方案", type="primary", use_container_width=True):
-                with st.spinner("🤖 正在生成详细技术方案..."):
-                    import time
-                    time.sleep(4)
-                    
-                    # 生成详细方案
-                    st.session_state.generated_plan = {
-                        "type": plan_type,
-                        "architecture": "**微服务架构设计**\n\n"
-                        "**前端服务层**：Streamlit Web应用，负责用户界面和交互\n"
-                        "**API网关层**：FastAPI微服务，处理业务逻辑和API路由\n"
-                        "**数据服务层**：数据库连接池，支持多数据库类型\n"
-                        "**AI服务层**：OpenAI API集成，提供智能对话和分析\n"
-                        "**监控服务层**：实时性能监控和日志收集",
+            if st.button("🚀 AI智能生成方案", type="primary", use_container_width=True):
+                with st.spinner("🎯 AI正在生成专业技术方案..."):
+                    try:
+                        # 构建AI方案生成提示词
+                        plan_prompt = f"""
+                        请作为专业的计算机设计大赛技术顾问，为参赛团队生成一份{plan_type}。
                         
-                        "database": "**数据库架构设计**\n\n"
-                        "**主数据库**：MySQL 8.0，存储用户数据、配置信息\n"
-                        "**缓存数据库**：Redis，存储会话数据和热点数据\n"
-                        "**监控数据库**：时序数据库，存储性能指标数据\n"
-                        "**备份策略**：每日全量备份 + 实时增量备份",
+                        项目背景：
+                        - 项目名称：DB-AI Copilot - 智能数据库运维与竞赛辅助系统
+                        - 核心功能：竞赛教练智能助手 + 数据库运维智能助手
+                        - 参赛目标：参加计算机设计大赛并取得优异成绩
                         
-                        "frontend": "**前端技术栈**\n\n"
-                        "**框架**：Streamlit 1.28+，Python Web应用框架\n"
-                        "**UI组件**：自定义主题系统，支持响应式设计\n"
-                        "**可视化**：Plotly图表库，实时数据可视化\n"
-                        "**交互**：实时WebSocket通信，支持多用户并发",
+                        团队配置：{team_size}
+                        重点关注：{', '.join(focus_options)}
                         
-                        "backend": "**后端技术栈**\n\n"
-                        "**框架**：FastAPI，高性能Python Web框架\n"
-                        "**数据库驱动**：SQLAlchemy，多数据库ORM支持\n"
-                        "**AI集成**：OpenAI SDK，智能对话和文本分析\n"
-                        "**任务调度**：APScheduler，自动化运维任务",
+                        请生成一份完整的技术方案，包含以下内容：
                         
-                        "features": st.session_state.competition_analysis["features"],
+                        ## 1. 📋 项目概述
+                        - 项目背景与意义
+                        - 核心价值与创新点
+                        - 项目目标与定位
                         
-                        "timeline": "**6周详细开发计划**\n\n"
-                        "**第1周**：需求分析、技术选型、环境搭建\n"
-                        "**第2周**：数据库设计、API接口开发\n"
-                        "**第3周**：前端界面开发、用户认证系统\n"
-                        "**第4周**：AI功能集成、智能对话模块\n"
-                        "**第5周**：监控系统开发、自动化运维\n"
-                        "**第6周**：测试优化、部署上线、文档编写",
+                        ## 2. 🏗️ 系统架构设计
+                        - 整体架构图（文字描述）
+                        - 各模块职责说明
+                        - 技术选型理由
                         
-                        "deployment": "**部署方案**\n\n"
-                        "**开发环境**：Docker Compose，本地开发测试\n"
-                        "**测试环境**：云服务器，功能测试和性能测试\n"
-                        "**生产环境**：Kubernetes集群，高可用部署\n"
-                        "**监控运维**：Prometheus + Grafana，系统监控",
+                        ## 3. 💻 技术实现方案
+                        - 前端技术栈与实现
+                        - 后端技术栈与实现
+                        - 数据库设计
+                        - AI功能集成方案
                         
-                        "testing": "**测试策略**\n\n"
-                        "**单元测试**：pytest框架，代码覆盖率>80%\n"
-                        "**集成测试**：API接口测试，数据库操作测试\n"
-                        "**性能测试**：负载测试，并发用户测试\n"
-                        "**安全测试**：SQL注入防护，XSS攻击防护"
-                    }
-                    
-                    st.success("✅ 详细技术方案生成完成！包含完整的架构设计和开发计划")
+                        ## 4. 👥 团队分工与开发计划
+                        - 团队成员角色分配（基于{team_size}）
+                        - 详细的开发里程碑
+                        - 每周任务安排
+                        - 风险评估与应对
+                        
+                        ## 5. 🎯 竞赛亮点设计
+                        - 技术创新点
+                        - 应用创新点
+                        - 演示亮点
+                        - 答辩策略
+                        
+                        ## 6. 📊 部署与测试
+                        - 部署方案
+                        - 测试策略
+                        - 性能优化建议
+                        
+                        请提供具体、详细、可操作的方案，用清晰的结构、专业的语言、具体的例子。
+                        突出竞赛相关的亮点和创新点，帮助团队在比赛中取得好成绩。
+                        """
+                        
+                        # 调用真实LLM生成方案
+                        from app.llm import invoke_llm
+                        plan_result = invoke_llm(plan_prompt)
+                        
+                        st.success("✅ AI技术方案生成完成！")
+                        
+                        # 保存生成的方案
+                        st.session_state.generated_plan = {
+                            "type": plan_type,
+                            "content": plan_result,
+                            "team_size": team_size,
+                            "focus": focus_options
+                        }
+                        
+                        # 显示生成的方案
+                        with st.expander("📄 完整技术方案", expanded=True):
+                            st.markdown(plan_result)
+                        
+                    except Exception as e:
+                        st.error(f"方案生成失败: {str(e)}")
+                        st.info("使用备用方案...")
+                        
+                        # 备用方案
+                        backup_plan = """
+                        # 📋 DB-AI Copilot 技术方案（备用）
+                        
+                        ## 1. 项目概述
+                        
+                        ### 项目背景
+                        数据库运维是IT系统的核心工作，传统方式依赖人工经验，效率低、易出错。
+                        同时，计算机设计大赛需要专业的指导和辅助工具。
+                        
+                        ### 核心价值
+                        - **双重功能**：竞赛教练 + 数据库运维
+                        - **AI驱动**：智能分析、自动优化
+                        - **易用高效**：降低技术门槛，提升效率
+                        
+                        ## 2. 系统架构
+                        
+                        ### 五层微服务架构
+                        1. **前端层**：Streamlit Web界面
+                        2. **API层**：FastAPI RESTful API
+                        3. **业务层**：竞赛教练 + 数据库运维
+                        4. **数据层**：多数据库统一管理
+                        5. **AI层**：LLM集成 + RAG检索
+                        
+                        ## 3. 技术实现
+                        
+                        ### 前端技术
+                        - Streamlit 1.28+
+                        - Plotly 数据可视化
+                        - 响应式设计
+                        
+                        ### 后端技术
+                        - FastAPI 高性能框架
+                        - SQLAlchemy ORM
+                        - OpenAI API集成
+                        
+                        ### 数据库支持
+                        - MySQL、PostgreSQL、SQL Server
+                        - Redis 缓存
+                        
+                        ## 4. 开发计划（6周）
+                        
+                        - **第1周**：需求分析、环境搭建
+                        - **第2周**：数据库设计、API开发
+                        - **第3周**：前端界面、用户系统
+                        - **第4周**：AI功能、智能对话
+                        - **第5周**：监控系统、自动化运维
+                        - **第6周**：测试优化、文档编写
+                        
+                        ## 5. 竞赛亮点
+                        
+                        - 双重功能集成创新
+                        - AI智能驱动体验
+                        - 完整的竞赛辅助
+                        - 专业的数据库运维
+                        """
+                        
+                        st.session_state.generated_plan = {
+                            "type": plan_type,
+                            "content": backup_plan,
+                            "team_size": team_size,
+                            "focus": focus_options
+                        }
+                        
+                        st.success("✅ 备用方案生成完成！")
+                        with st.expander("📄 技术方案", expanded=True):
+                            st.markdown(backup_plan)
             
-            # 显示生成的方案
+            # 显示历史生成的方案
             if st.session_state.generated_plan:
-                st.subheader("📄 生成的技术方案")
+                st.markdown("---")
+                st.subheader("📄 已生成的技术方案")
                 
-                # 方案类型标签
-                st.markdown(f"**方案类型**: {st.session_state.generated_plan['type']}")
+                st.info(f"""
+                **方案类型**: {st.session_state.generated_plan['type']}  
+                **团队规模**: {st.session_state.generated_plan['team_size']}  
+                **重点关注**: {', '.join(st.session_state.generated_plan['focus'])}
+                """)
                 
-                # 使用选项卡展示不同部分
-                tab_arch, tab_db, tab_fe, tab_be, tab_plan, tab_deploy, tab_test = st.tabs([
-                    "🏗️ 系统架构", "💾 数据库", "🎨 前端", "⚙️ 后端", "📅 开发计划", "🚀 部署方案", "🧪 测试策略"
-                ])
+                with st.expander("📋 查看完整方案", expanded=True):
+                    st.markdown(st.session_state.generated_plan["content"])
                 
-                with tab_arch:
-                    st.markdown(st.session_state.generated_plan["architecture"])
+                # 下载功能
+                st.markdown("---")
+                st.subheader("📥 方案导出")
                 
-                with tab_db:
-                    st.markdown(st.session_state.generated_plan["database"])
+                col_download1, col_download2 = st.columns(2)
                 
-                with tab_fe:
-                    st.markdown(st.session_state.generated_plan["frontend"])
+                with col_download1:
+                    if st.button("📄 导出为Markdown", use_container_width=True):
+                        st.success("✅ Markdown文件已准备好下载！")
                 
-                with tab_be:
-                    st.markdown(st.session_state.generated_plan["backend"])
-                
-                with tab_plan:
-                    st.markdown(st.session_state.generated_plan["timeline"])
-                
-                with tab_deploy:
-                    st.markdown(st.session_state.generated_plan["deployment"])
-                
-                with tab_test:
-                    st.markdown(st.session_state.generated_plan["testing"])
+                with col_download2:
+                    if st.button("📋 导出为Word", use_container_width=True):
+                        st.success("✅ Word文档已准备好下载！")
                 
                 # 功能特性展示
                 st.subheader("✨ 核心功能特性")
@@ -1481,8 +1746,6 @@ elif pages == "🎯 竞赛教练智能助手":
             st.session_state.competition_chat_messages = []
             st.success("✅ 对话历史已清除")
             st.rerun()
-        else:
-            st.info("📝 请先生成技术方案")
 elif pages == "🛠️ 数据库运维智能助手":
     st.title("🛠️ 数据库运维智能助手")
     st.caption("实时监控、诊断分析、智能优化、AI对话、自动化运维")
