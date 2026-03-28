@@ -555,8 +555,36 @@ if pages == "🏠 欢迎页面":
             ''', unsafe_allow_html=True)
 
 elif pages == "🎯 竞赛教练智能助手":
-    st.title("🎯 竞赛教练智能助手")
-    st.caption("上传比赛需求文件 -> 建立索引 -> 生成方案/功能/ Demo 剧本/评测/答辩大纲")
+    st.title("🎯 增强版竞赛教练智能助手")
+    st.caption("AI驱动的智能竞赛助手 - 深度分析、智能方案、Demo演示、答辩准备")
+    
+    # 智能助手能力展示
+    st.markdown("""
+    <div class="card" style="margin-bottom: 20px;">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; margin-bottom: 5px;">🔍</div>
+                <div style="font-weight: bold;">深度分析</div>
+                <div style="font-size: 12px; color: #666;">AI智能理解需求</div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; margin-bottom: 5px;">💡</div>
+                <div style="font-weight: bold;">智能推荐</div>
+                <div style="font-size: 12px; color: #666;">技术方案建议</div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; margin-bottom: 5px;">🎭</div>
+                <div style="font-weight: bold;">Demo剧本</div>
+                <div style="font-size: 12px; color: #666;">定制化演示脚本</div>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; margin-bottom: 5px;">🎯</div>
+                <div style="font-weight: bold;">答辩准备</div>
+                <div style="font-size: 12px; color: #666;">完整答辩材料</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # 初始化竞赛教练相关状态
     if "competition_docs" not in st.session_state:
@@ -567,7 +595,7 @@ elif pages == "🎯 竞赛教练智能助手":
         st.session_state.generated_plan = {}
     
     # 功能选项卡
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📁 文档上传", "🔍 智能分析", "📋 方案生成", "🎭 Demo剧本", "🎯 答辩大纲"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📁 文档上传", "🔍 智能分析", "📋 方案生成", "🎭 Demo剧本", "🎯 答辩大纲", "🤖 AI智能对话"])
     
     with tab1:
         st.header("📁 上传比赛需求文档")
@@ -1269,6 +1297,188 @@ elif pages == "🎯 竞赛教练智能助手":
                         """
                     
                     st.code(defense_outline, language="markdown")
+    
+    with tab6:
+        st.header("🤖 竞赛教练AI智能对话")
+        st.markdown("与专业的竞赛教练AI助手对话，获取参赛建议、技术指导、方案优化等专业建议")
+        
+        # 初始化竞赛教练对话历史
+        if "competition_chat_messages" not in st.session_state:
+            st.session_state.competition_chat_messages = []
+        
+        # 显示对话历史
+        for message in st.session_state.competition_chat_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        
+        # 竞赛教练提示词系统
+        def get_competition_coach_response(prompt, context=None):
+            """竞赛教练AI响应生成"""
+            
+            base_prompt = """
+            你是一位经验丰富的计算机设计大赛专业教练，拥有多年的竞赛指导经验。
+            
+            你的专业领域包括：
+            - 计算机设计大赛参赛指导
+            - 项目需求分析和技术方案设计
+            - Demo演示和答辩技巧指导
+            - 技术选型和架构设计建议
+            - 团队协作和时间管理
+            - 创新点挖掘和特色展示
+            
+            请提供专业、实用、具体的建议，帮助参赛团队取得好成绩。
+            """
+            
+            # 添加上下文信息
+            if context:
+                full_prompt = f"{base_prompt}\n\n{context}\n\n用户问题：{prompt}"
+            else:
+                full_prompt = f"{base_prompt}\n\n用户问题：{prompt}"
+            
+            # 模拟AI响应（实际项目中应该调用真实的LLM）
+            responses = {
+                "项目介绍": """
+                📋 **项目介绍建议**
+                
+                一个好的项目介绍应该包含：
+                1. **背景与意义** - 说明为什么要做这个项目
+                2. **创新亮点** - 突出项目的独特之处
+                3. **技术架构** - 简要说明技术方案
+                4. **应用价值** - 展示项目的实用价值
+                
+                💡 建议用数据或案例来支持你的项目介绍！
+                """,
+                
+                "技术选型": """
+                🛠️ **技术选型建议**
+                
+                选择技术栈时需要考虑：
+                1. **团队熟悉度** - 优先选择团队熟悉的技术
+                2. **项目需求** - 根据功能需求选择合适的技术
+                3. **可维护性** - 考虑技术的社区支持和文档完善度
+                4. **性能要求** - 根据性能需求选择合适的方案
+                
+                💡 建议制作技术选型对比表来帮助决策！
+                """,
+                
+                "答辩技巧": """
+                🎯 **答辩技巧建议**
+                
+                答辩时的关键要点：
+                1. **时间控制** - 严格遵守时间限制
+                2. **重点突出** - 突出创新点和技术亮点
+                3. **演示流畅** - 提前充分演练Demo
+                4. **应对提问** - 准备常见问题的回答
+                
+                💡 建议录制排练视频来发现问题！
+                """,
+                
+                "Demo演示": """
+                🎬 **Demo演示建议**
+                
+                一个精彩的Demo应该：
+                1. **提前准备** - 准备好测试数据和演示环境
+                2. **流程清晰** - 按照用户故事流程演示
+                3. **突出亮点** - 重点展示核心功能
+                4. **应急预案** - 准备备用方案应对技术问题
+                
+                💡 建议准备多个演示场景！
+                """,
+                
+                "团队协作": """
+                👥 **团队协作建议**
+                
+                高效的团队协作需要：
+                1. **明确分工** - 根据每个人的特长分配任务
+                2. **定期沟通** - 保持频繁的信息同步
+                3. **代码管理** - 使用Git等版本控制工具
+                4. **文档完善** - 保持技术文档的更新
+                
+                💡 建议使用项目管理工具来跟踪进度！
+                """
+            }
+            
+            # 根据关键词返回相应的建议
+            for key, response in responses.items():
+                if key in prompt:
+                    return response
+            
+            # 默认响应
+            return f"""
+            🤖 **竞赛教练建议**
+            
+            针对您的问题"{prompt}"，我的建议是：
+            
+            1. **深入分析需求** - 仔细理解比赛要求和评分标准
+            2. **突出创新亮点** - 找到项目的独特之处
+            3. **完善技术方案** - 确保技术方案的可行性和先进性
+            4. **充分准备答辩** - 提前演练，准备应对各种问题
+            
+            💡 如需更具体的建议，请告诉我更多细节！
+            """
+        
+        # 用户输入
+        if prompt := st.chat_input("请输入您的问题... (例如：如何准备答辩？技术选型建议？)"):
+            # 添加用户消息
+            st.session_state.competition_chat_messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            
+            # AI回复
+            with st.chat_message("assistant"):
+                with st.spinner("🎯 竞赛教练正在思考..."):
+                    try:
+                        # 构建上下文
+                        context = ""
+                        if st.session_state.competition_analysis:
+                            context += f"""
+                            当前项目分析：
+                            - 项目难度：{st.session_state.competition_analysis.get('difficulty', '未知')}
+                            - 技术栈：{', '.join(st.session_state.competition_analysis.get('tech_stack', []))}
+                            """
+                        
+                        # 生成响应
+                        response = get_competition_coach_response(prompt, context)
+                        st.markdown(response)
+                        st.session_state.competition_chat_messages.append({"role": "assistant", "content": response})
+                    except Exception as e:
+                        error_msg = f"😔 抱歉，竞赛教练暂时无法回答：{str(e)}"
+                        st.error(error_msg)
+                        st.session_state.competition_chat_messages.append({"role": "assistant", "content": error_msg})
+        
+        # 快捷问题
+        st.markdown("---")
+        st.subheader("💡 快捷问题")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            quick_questions1 = [
+                "如何准备项目介绍？",
+                "技术选型有什么建议？",
+                "答辩时有什么技巧？"
+            ]
+            for q in quick_questions1:
+                if st.button(q, use_container_width=True, key=f"comp_quick1_{hash(q)}"):
+                    st.session_state.competition_chat_messages.append({"role": "user", "content": q})
+                    st.rerun()
+        
+        with col2:
+            quick_questions2 = [
+                "如何准备Demo演示？",
+                "团队如何高效协作？",
+                "如何挖掘项目创新点？"
+            ]
+            for q in quick_questions2:
+                if st.button(q, use_container_width=True, key=f"comp_quick2_{hash(q)}"):
+                    st.session_state.competition_chat_messages.append({"role": "user", "content": q})
+                    st.rerun()
+        
+        # 清除对话
+        if st.button("🧹 清除对话历史", use_container_width=True):
+            st.session_state.competition_chat_messages = []
+            st.success("✅ 对话历史已清除")
+            st.rerun()
         else:
             st.info("📝 请先生成技术方案")
 elif pages == "🛠️ 数据库运维智能助手":
@@ -1358,8 +1568,36 @@ elif pages == "🛠️ 数据库运维智能助手":
                 recommender = IndexRecommender(st.session_state.db_connection)
                 
         with tab4:
-            st.header("🤖 AI对话助手")
-            st.markdown("与数据库AI助手进行智能对话，获取优化建议和问题诊断")
+            st.header("🤖 增强版AI对话助手")
+            st.markdown("与智能数据库AI助手对话，获取专业的诊断、优化建议和解决方案")
+            
+            # AI助手能力展示
+            st.markdown("""
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">🧠</div>
+                        <div style="font-weight: bold;">智能分类</div>
+                        <div style="font-size: 12px; color: #666;">自动识别问题类型</div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">📝</div>
+                        <div style="font-weight: bold;">记忆系统</div>
+                        <div style="font-size: 12px; color: #666;">短期+长期记忆</div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">⚡</div>
+                        <div style="font-weight: bold;">主动学习</div>
+                        <div style="font-size: 12px; color: #666;">持续积累经验</div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="font-size: 24px; margin-bottom: 5px;">🎯</div>
+                        <div style="font-weight: bold;">上下文感知</div>
+                        <div style="font-size: 12px; color: #666;">理解对话历史</div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             # 初始化对话历史
             if "chat_messages" not in st.session_state:
@@ -1371,7 +1609,7 @@ elif pages == "🛠️ 数据库运维智能助手":
                     st.markdown(message["content"])
             
             # 用户输入
-            if prompt := st.chat_input("请输入您的问题..."):
+            if prompt := st.chat_input("请输入您的问题... (例如：数据库性能如何？如何优化慢查询？)"):
                 # 添加用户消息
                 st.session_state.chat_messages.append({"role": "user", "content": prompt})
                 with st.chat_message("user"):
@@ -1379,38 +1617,69 @@ elif pages == "🛠️ 数据库运维智能助手":
                 
                 # AI回复
                 with st.chat_message("assistant"):
-                    with st.spinner("AI助手正在思考..."):
+                    with st.spinner("🤖 AI助手正在智能分析..."):
                         try:
-                            response = st.session_state.ai_dialogue.ask_question(prompt)
+                            response = st.session_state.ai_dialogue.ask_question(prompt, use_history=True, use_long_term_memory=True)
                             st.markdown(response)
                             st.session_state.chat_messages.append({"role": "assistant", "content": response})
                         except Exception as e:
-                            error_msg = f"抱歉，AI助手暂时无法回答：{str(e)}"
+                            error_msg = f"😔 抱歉，AI助手暂时无法回答：{str(e)}"
                             st.error(error_msg)
                             st.session_state.chat_messages.append({"role": "assistant", "content": error_msg})
             
-            # 快速问题示例
+            # 高级功能
             st.markdown("---")
-            st.subheader("💡 快速问题示例")
+            
             col1, col2 = st.columns(2)
             
             with col1:
-                if st.button("数据库性能如何？", use_container_width=True):
-                    st.session_state.chat_messages.append({"role": "user", "content": "数据库性能如何？"})
-                    st.rerun()
+                st.subheader("🔧 智能工具")
+                if st.button("📊 生成智能诊断报告", use_container_width=True):
+                    with st.spinner("🤖 正在生成详细诊断报告..."):
+                        try:
+                            report = st.session_state.ai_dialogue.generate_diagnostic_report(detailed=True)
+                            st.session_state.chat_messages.append({"role": "user", "content": "请生成数据库诊断报告"})
+                            st.session_state.chat_messages.append({"role": "assistant", "content": report})
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"生成报告失败: {str(e)}")
                 
-                if st.button("有哪些慢查询？", use_container_width=True):
-                    st.session_state.chat_messages.append({"role": "user", "content": "有哪些慢查询？"})
-                    st.rerun()
+                if st.button("🧹 清除对话记忆", use_container_width=True):
+                    try:
+                        st.session_state.ai_dialogue.clear_history()
+                        st.session_state.chat_messages = []
+                        st.success("✅ 对话记忆已清除")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"清除失败: {str(e)}")
             
             with col2:
-                if st.button("如何优化索引？", use_container_width=True):
-                    st.session_state.chat_messages.append({"role": "user", "content": "如何优化索引？"})
-                    st.rerun()
+                st.subheader("💡 快捷问题")
+                quick_questions = [
+                    "数据库当前性能状态如何？",
+                    "有哪些需要优化的慢查询？",
+                    "请提供索引优化建议",
+                    "数据库安全配置建议",
+                    "如何提高数据库响应速度？",
+                    "分析当前锁等待情况"
+                ]
                 
-                if st.button("数据库安全建议", use_container_width=True):
-                    st.session_state.chat_messages.append({"role": "user", "content": "数据库安全建议"})
-                    st.rerun()
+                for q in quick_questions:
+                    if st.button(q, use_container_width=True, key=f"quick_{hash(q)}"):
+                        st.session_state.chat_messages.append({"role": "user", "content": q})
+                        st.rerun()
+            
+            # 对话统计
+            if st.session_state.chat_messages:
+                st.markdown("---")
+                st.subheader("📈 对话统计")
+                col_stats1, col_stats2, col_stats3 = st.columns(3)
+                with col_stats1:
+                    st.metric("总对话轮次", len(st.session_state.chat_messages) // 2)
+                with col_stats2:
+                    st.metric("用户消息", len([m for m in st.session_state.chat_messages if m["role"] == "user"]))
+                with col_stats3:
+                    st.metric("AI回复", len([m for m in st.session_state.chat_messages if m["role"] == "assistant"]))
         
         with tab5:
             st.header("🔄 自动化运维")
