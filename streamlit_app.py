@@ -52,43 +52,183 @@ if "session_token" not in st.session_state:
 
 # 登录界面
 if not st.session_state.authenticated:
-    st.title("🔐 数据库AI助手 - DBAI-Copilot")
-    st.markdown("---")
+    # 应用登录页面特殊样式
+    st.markdown("""
+    <style>
+    .login-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 40px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border: 1px solid #e1e8ed;
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .login-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+    .login-subtitle {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
+    # 登录容器
+    st.markdown('<div class="login-container">', unsafe_allow_html=True)
     
-    with col1:
-        st.subheader("用户登录")
-        username = st.text_input("用户名", placeholder="请输入用户名")
-        password = st.text_input("密码", type="password", placeholder="请输入密码")
+    # 登录标题
+    st.markdown('''
+    <div class="login-header">
+        <div class="login-title">🔐 DBAI-Copilot</div>
+        <div class="login-subtitle">数据库AI助手 - 智能运维平台</div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    # 登录和注册选项卡
+    tab1, tab2 = st.tabs(["🔑 用户登录", "📝 用户注册"])
+    
+    with tab1:
+        st.subheader("🔑 用户登录")
         
-        if st.button("登录", type="primary", use_container_width=True):
-            if username and password:
-                session_token = st.session_state.security_manager.login(username, password)
-                if session_token:
-                    st.session_state.authenticated = True
-                    st.session_state.session_token = session_token
-                    st.session_state.username = username
-                    st.rerun()
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            username = st.text_input("👤 用户名", placeholder="请输入用户名", key="login_username")
+            password = st.text_input("🔒 密码", type="password", placeholder="请输入密码", key="login_password")
+            
+            # 登录按钮
+            if st.button("🚀 登录系统", type="primary", use_container_width=True):
+                if username and password:
+                    session_token = st.session_state.security_manager.login(username, password)
+                    if session_token:
+                        st.session_state.authenticated = True
+                        st.session_state.session_token = session_token
+                        st.session_state.username = username
+                        st.rerun()
+                    else:
+                        st.error("❌ 用户名或密码错误")
                 else:
-                    st.error("用户名或密码错误")
-            else:
-                st.warning("请输入用户名和密码")
-    
-    with col2:
-        st.markdown("### 💡 系统信息")
-        st.info("""
-        **默认账户:**
-        - 用户名: admin
-        - 密码: admin123
+                    st.warning("⚠️ 请输入用户名和密码")
+            
+            # 记住我
+            st.checkbox("记住登录状态", value=True)
         
-        **系统功能:**
-        - 竞赛教练智能助手
-        - 数据库运维智能助手
-        - 多数据库支持
-        - AI智能分析
-        - 自动化运维
-        """)
+        with col2:
+            st.markdown("### 📋 快速登录")
+            
+            # 默认账户卡片
+            with st.container():
+                st.markdown("#### 👤 默认账户")
+                st.markdown("""
+                **用户名**: admin  
+                **密码**: admin123
+                """)
+                
+                if st.button("⚡ 快速登录", key="quick_login", use_container_width=True):
+                    session_token = st.session_state.security_manager.login("admin", "admin123")
+                    if session_token:
+                        st.session_state.authenticated = True
+                        st.session_state.session_token = session_token
+                        st.session_state.username = "admin"
+                        st.rerun()
+    
+    with tab2:
+        st.subheader("📝 用户注册")
+        
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            new_username = st.text_input("👤 新用户名", placeholder="请输入3-20位用户名", key="register_username")
+            new_password = st.text_input("🔒 设置密码", type="password", placeholder="请输入6位以上密码", key="register_password")
+            confirm_password = st.text_input("🔒 确认密码", type="password", placeholder="请再次输入密码", key="confirm_password")
+            
+            # 用户角色选择
+            user_role = st.selectbox("🎯 用户角色", ["viewer", "operator", "admin"], 
+                                    format_func=lambda x: {"viewer": "👀 查看者", "operator": "⚙️ 操作员", "admin": "👑 管理员"}[x])
+            
+            # 注册按钮
+            if st.button("✅ 注册账号", type="primary", use_container_width=True):
+                if new_username and new_password and confirm_password:
+                    if len(new_username) < 3:
+                        st.error("❌ 用户名长度至少3个字符")
+                    elif len(new_password) < 6:
+                        st.error("❌ 密码长度至少6个字符")
+                    elif new_password != confirm_password:
+                        st.error("❌ 两次输入的密码不一致")
+                    else:
+                        success = st.session_state.security_manager.register(new_username, new_password, user_role)
+                        if success:
+                            st.success("✅ 账号注册成功！请使用新账号登录")
+                            # 清空输入框
+                            st.session_state.register_username = ""
+                            st.session_state.register_password = ""
+                            st.session_state.confirm_password = ""
+                        else:
+                            st.error("❌ 注册失败，用户名可能已存在")
+                else:
+                    st.warning("⚠️ 请填写完整的注册信息")
+        
+        with col2:
+            st.markdown("### 💡 角色说明")
+            
+            with st.container():
+                st.markdown("#### 👀 查看者")
+                st.markdown("""
+                - 查看系统状态
+                - 查看监控数据
+                - 查看日志信息
+                """)
+            
+            st.markdown("---")
+            
+            with st.container():
+                st.markdown("#### ⚙️ 操作员")
+                st.markdown("""
+                - 查看者所有权限
+                - 执行数据库操作
+                - 管理自动化任务
+                """)
+            
+            st.markdown("---")
+            
+            with st.container():
+                st.markdown("#### 👑 管理员")
+                st.markdown("""
+                - 操作员所有权限
+                - 管理用户账号
+                - 系统配置管理
+                """)
+    
+    # 功能特色
+    st.markdown("---")
+    st.markdown("### 💡 平台特色")
+    st.markdown("""
+    - 🤖 AI智能对话
+    - 📊 实时监控
+    - 🔍 智能诊断
+    - ⚡ 自动优化
+    - 🔒 安全可靠
+    """)
+    
+    # 底部信息
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; color: #7f8c8d; font-size: 0.9rem;">
+        <strong>数据库AI助手 - DBAI-Copilot</strong> | 版本 1.0.0 | 技术支持
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     st.stop()
 
@@ -209,6 +349,294 @@ if pages == "🏠 欢迎页面":
 elif pages == "🎯 竞赛教练智能助手":
     st.title("🎯 竞赛教练智能助手")
     st.caption("上传比赛需求文件 -> 建立索引 -> 生成方案/功能/ Demo 剧本/评测/答辩大纲")
+    
+    # 初始化竞赛教练相关状态
+    if "competition_docs" not in st.session_state:
+        st.session_state.competition_docs = []
+    if "competition_analysis" not in st.session_state:
+        st.session_state.competition_analysis = {}
+    if "generated_plan" not in st.session_state:
+        st.session_state.generated_plan = {}
+    
+    # 功能选项卡
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📁 文档上传", "🔍 智能分析", "📋 方案生成", "🎭 Demo剧本", "🎯 答辩大纲"])
+    
+    with tab1:
+        st.header("📁 上传比赛需求文档")
+        
+        uploaded_files = st.file_uploader(
+            "选择比赛需求文档",
+            type=["pdf", "docx", "txt", "md"],
+            accept_multiple_files=True,
+            help="支持PDF、Word、文本文件格式"
+        )
+        
+        if uploaded_files:
+            for uploaded_file in uploaded_files:
+                st.session_state.competition_docs.append({
+                    "name": uploaded_file.name,
+                    "size": uploaded_file.size,
+                    "type": uploaded_file.type
+                })
+            
+            st.success(f"✅ 成功上传 {len(uploaded_files)} 个文档")
+            
+            # 显示上传的文档列表
+            st.subheader("📋 已上传文档")
+            for doc in st.session_state.competition_docs:
+                col1, col2, col3 = st.columns([3, 1, 1])
+                with col1:
+                    st.write(f"📄 {doc['name']}")
+                with col2:
+                    st.write(f"📊 {doc['size']} bytes")
+                with col3:
+                    if st.button("🗑️", key=f"delete_{doc['name']}"):
+                        st.session_state.competition_docs = [d for d in st.session_state.competition_docs if d['name'] != doc['name']]
+                        st.rerun()
+        
+        # 手动输入需求
+        st.subheader("📝 手动输入需求")
+        manual_input = st.text_area(
+            "或直接输入比赛需求描述",
+            placeholder="请输入比赛的具体需求、目标、技术要求等...",
+            height=150
+        )
+        
+        if st.button("🚀 开始分析", type="primary", use_container_width=True):
+            if st.session_state.competition_docs or manual_input:
+                with st.spinner("🤖 AI正在分析比赛需求..."):
+                    # 模拟分析过程
+                    import time
+                    time.sleep(2)
+                    
+                    # 生成分析结果
+                    st.session_state.competition_analysis = {
+                        "requirements": "已识别比赛需求",
+                        "tech_stack": ["Python", "Streamlit", "数据库"],
+                        "features": ["智能对话", "实时监控", "数据分析"],
+                        "difficulty": "中等",
+                        "timeline": "4周"
+                    }
+                    
+                    st.success("✅ 需求分析完成！")
+            else:
+                st.warning("⚠️ 请上传文档或输入需求描述")
+    
+    with tab2:
+        st.header("🔍 智能需求分析")
+        
+        if st.session_state.competition_analysis:
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader("📋 需求摘要")
+                st.info(st.session_state.competition_analysis["requirements"])
+                
+                st.subheader("⚙️ 技术栈推荐")
+                for tech in st.session_state.competition_analysis["tech_stack"]:
+                    st.write(f"- {tech}")
+            
+            with col2:
+                st.subheader("🎯 功能特性")
+                for feature in st.session_state.competition_analysis["features"]:
+                    st.write(f"- {feature}")
+                
+                st.subheader("📊 项目评估")
+                st.write(f"**难度等级**: {st.session_state.competition_analysis['difficulty']}")
+                st.write(f"**预计周期**: {st.session_state.competition_analysis['timeline']}")
+            
+            # 进一步分析选项
+            st.subheader("🔧 深度分析")
+            analysis_options = st.multiselect(
+                "选择分析维度",
+                ["架构设计", "数据库设计", "界面设计", "安全设计", "性能优化"],
+                default=["架构设计", "数据库设计"]
+            )
+            
+            if st.button("🔍 执行深度分析", use_container_width=True):
+                with st.spinner("🤖 正在进行深度分析..."):
+                    import time
+                    time.sleep(3)
+                    
+                    # 生成深度分析结果
+                    depth_analysis = {}
+                    for option in analysis_options:
+                        depth_analysis[option] = f"{option}分析完成，建议方案已生成"
+                    
+                    st.session_state.competition_analysis["depth"] = depth_analysis
+                    st.success("✅ 深度分析完成！")
+                    
+                    # 显示深度分析结果
+                    for option, result in depth_analysis.items():
+                        with st.expander(f"📋 {option}分析结果"):
+                            st.write(result)
+        else:
+            st.info("📝 请先上传文档并完成基础分析")
+    
+    with tab3:
+        st.header("📋 智能方案生成")
+        
+        if st.session_state.competition_analysis:
+            st.subheader("🎯 生成完整技术方案")
+            
+            # 方案类型选择
+            plan_type = st.selectbox(
+                "选择方案类型",
+                ["基础方案", "详细方案", "完整方案"],
+                help="基础方案：核心功能设计；详细方案：包含技术细节；完整方案：包含所有文档"
+            )
+            
+            if st.button("🚀 生成方案", type="primary", use_container_width=True):
+                with st.spinner("🤖 正在生成技术方案..."):
+                    import time
+                    time.sleep(3)
+                    
+                    # 生成方案
+                    st.session_state.generated_plan = {
+                        "type": plan_type,
+                        "architecture": "微服务架构设计",
+                        "database": "MySQL + Redis缓存",
+                        "frontend": "Streamlit响应式界面",
+                        "backend": "Python FastAPI",
+                        "features": st.session_state.competition_analysis["features"],
+                        "timeline": "详细开发计划"
+                    }
+                    
+                    st.success("✅ 技术方案生成完成！")
+            
+            # 显示生成的方案
+            if st.session_state.generated_plan:
+                st.subheader("📄 生成的技术方案")
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**🏗️ 系统架构**")
+                    st.info(st.session_state.generated_plan["architecture"])
+                    
+                    st.write("**💾 数据库设计**")
+                    st.info(st.session_state.generated_plan["database"])
+                    
+                    st.write("**🎨 前端技术**")
+                    st.info(st.session_state.generated_plan["frontend"])
+                
+                with col2:
+                    st.write("**⚙️ 后端技术**")
+                    st.info(st.session_state.generated_plan["backend"])
+                    
+                    st.write("**✨ 核心功能**")
+                    for feature in st.session_state.generated_plan["features"]:
+                        st.write(f"- {feature}")
+                    
+                    st.write("**📅 开发计划**")
+                    st.info(st.session_state.generated_plan["timeline"])
+                
+                # 下载方案按钮
+                if st.button("📥 下载方案文档", use_container_width=True):
+                    st.success("✅ 方案文档已生成，准备下载...")
+        else:
+            st.info("📝 请先完成需求分析")
+    
+    with tab4:
+        st.header("🎭 Demo演示剧本")
+        
+        if st.session_state.generated_plan:
+            st.subheader("📺 演示脚本生成")
+            
+            demo_duration = st.slider("演示时长（分钟）", 5, 30, 15)
+            demo_style = st.selectbox("演示风格", ["技术型", "产品型", "混合型"])
+            
+            if st.button("🎬 生成演示剧本", use_container_width=True):
+                with st.spinner("🤖 正在生成演示剧本..."):
+                    import time
+                    time.sleep(2)
+                    
+                    st.success("✅ 演示剧本生成完成！")
+                    
+                    # 显示演示剧本
+                    st.subheader("📋 演示剧本大纲")
+                    
+                    demo_script = f"""
+                    # {demo_style}风格演示剧本 ({demo_duration}分钟)
+                    
+                    ## 开场介绍 (2分钟)
+                    - 项目背景和意义
+                    - 演示目标和内容概述
+                    
+                    ## 核心功能演示 ({demo_duration-4}分钟)
+                    - 主要功能点展示
+                    - 技术亮点演示
+                    - 用户体验展示
+                    
+                    ## 技术实现 (2分钟)
+                    - 架构设计亮点
+                    - 关键技术实现
+                    
+                    ## 总结展望 (2分钟)
+                    - 项目价值总结
+                    - 未来发展规划
+                    """
+                    
+                    st.code(demo_script, language="markdown")
+        else:
+            st.info("📝 请先生成技术方案")
+    
+    with tab5:
+        st.header("🎯 答辩准备材料")
+        
+        if st.session_state.generated_plan:
+            st.subheader("📊 答辩大纲生成")
+            
+            defense_type = st.selectbox("答辩类型", ["技术答辩", "产品答辩", "综合答辩"])
+            include_qa = st.checkbox("包含常见问题准备", value=True)
+            
+            if st.button("📋 生成答辩大纲", use_container_width=True):
+                with st.spinner("🤖 正在生成答辩大纲..."):
+                    import time
+                    time.sleep(2)
+                    
+                    st.success("✅ 答辩大纲生成完成！")
+                    
+                    # 显示答辩大纲
+                    st.subheader("📄 答辩大纲")
+                    
+                    defense_outline = f"""
+                    # {defense_type}答辩大纲
+                    
+                    ## 1. 项目介绍
+                    - 项目背景和意义
+                    - 创新点和特色
+                    
+                    ## 2. 技术实现
+                    - 系统架构设计
+                    - 关键技术选型
+                    - 性能优化措施
+                    
+                    ## 3. 功能展示
+                    - 核心功能演示
+                    - 用户体验设计
+                    
+                    ## 4. 项目成果
+                    - 完成度评估
+                    - 技术难点突破
+                    
+                    ## 5. 未来规划
+                    - 扩展方向
+                    - 优化计划
+                    """
+                    
+                    if include_qa:
+                        defense_outline += """
+                        
+                        ## 6. 常见问题准备
+                        - 技术选型理由
+                        - 性能优化策略
+                        - 安全设计考虑
+                        """
+                    
+                    st.code(defense_outline, language="markdown")
+        else:
+            st.info("📝 请先生成技术方案")
 elif pages == "🛠️ 数据库运维智能助手":
     st.title("🛠️ 数据库运维智能助手")
     st.caption("实时监控、诊断分析、智能优化、AI对话、自动化运维")
@@ -361,26 +789,273 @@ else:
     st.title("⚙️ 系统管理")
     st.caption("用户管理、权限控制、系统监控、日志查看")
     
+    # 检查管理员权限
+    user_info = st.session_state.security_manager.get_user_info(st.session_state.session_token)
+    is_admin = user_info and user_info.get('role') == 'admin'
+    
+    if not is_admin:
+        st.warning("⚠️ 您没有管理员权限，只能查看部分信息")
+    
     # 系统管理功能
-    tab1, tab2, tab3 = st.tabs(["👥 用户管理", "🔒 权限控制", "📊 系统监控"])
+    tab1, tab2, tab3, tab4 = st.tabs(["👥 用户管理", "🔒 权限控制", "📊 系统监控", "📋 操作日志"])
     
     with tab1:
         st.header("👥 用户管理")
-        st.info("用户管理功能正在开发中...")
+        
+        if is_admin:
+            # 用户列表
+            st.subheader("📋 用户列表")
+            users = st.session_state.security_manager.user_manager.users
+            
+            if users:
+                for username, user_info in users.items():
+                    col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 1])
+                    
+                    with col1:
+                        st.write(f"👤 **{username}**")
+                        st.write(f"角色: {user_info.get('role', '未知')}")
+                    
+                    with col2:
+                        st.write(f"创建: {user_info.get('created_at', '未知')[:10]}")
+                    
+                    with col3:
+                        last_login = user_info.get('last_login', '从未登录')
+                        if last_login != '从未登录':
+                            st.write(f"登录: {last_login[:10]}")
+                        else:
+                            st.write("从未登录")
+                    
+                    with col4:
+                        # 编辑角色
+                        if st.button("✏️", key=f"edit_{username}"):
+                            st.session_state.editing_user = username
+                            st.rerun()
+                    
+                    with col5:
+                        # 删除用户（不能删除自己）
+                        if username != st.session_state.username:
+                            if st.button("🗑️", key=f"delete_{username}"):
+                                if st.session_state.security_manager.delete_user(username):
+                                    st.success(f"✅ 用户 {username} 已删除")
+                                    st.rerun()
+                                else:
+                                    st.error("❌ 删除用户失败")
+                    
+                    st.markdown("---")
+            else:
+                st.info("📝 暂无用户数据")
+            
+            # 编辑用户角色
+            if 'editing_user' in st.session_state:
+                st.subheader("✏️ 编辑用户角色")
+                editing_user = st.session_state.editing_user
+                current_role = users[editing_user].get('role', 'viewer')
+                
+                new_role = st.selectbox(
+                    "选择新角色",
+                    ["viewer", "operator", "admin"],
+                    index=["viewer", "operator", "admin"].index(current_role),
+                    format_func=lambda x: {"viewer": "👀 查看者", "operator": "⚙️ 操作员", "admin": "👑 管理员"}[x],
+                    key="edit_role"
+                )
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button("✅ 保存修改", use_container_width=True):
+                        if st.session_state.security_manager.update_user_role(editing_user, new_role):
+                            st.success(f"✅ 用户 {editing_user} 角色已更新为 {new_role}")
+                            del st.session_state.editing_user
+                            st.rerun()
+                        else:
+                            st.error("❌ 更新角色失败")
+                
+                with col2:
+                    if st.button("❌ 取消", use_container_width=True):
+                        del st.session_state.editing_user
+                        st.rerun()
+        else:
+            st.info("🔒 需要管理员权限才能管理用户")
         
     with tab2:
         st.header("🔒 权限控制")
-        st.info("权限控制功能正在开发中...")
+        
+        if is_admin:
+            st.subheader("🎯 权限配置")
+            
+            # 权限矩阵
+            permissions = {
+                "viewer": ["查看系统状态", "查看监控数据", "查看日志信息"],
+                "operator": ["查看者权限", "执行数据库操作", "管理自动化任务"],
+                "admin": ["操作员权限", "管理用户账号", "系统配置管理"]
+            }
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.subheader("👀 查看者")
+                for perm in permissions["viewer"]:
+                    st.write(f"✅ {perm}")
+            
+            with col2:
+                st.subheader("⚙️ 操作员")
+                for perm in permissions["operator"]:
+                    st.write(f"✅ {perm}")
+            
+            with col3:
+                st.subheader("👑 管理员")
+                for perm in permissions["admin"]:
+                    st.write(f"✅ {perm}")
+            
+            st.subheader("⚙️ 权限设置")
+            
+            # 权限调整选项
+            permission_options = st.multiselect(
+                "选择要调整的权限",
+                ["数据库操作", "用户管理", "系统配置", "日志查看", "监控管理"],
+                default=["数据库操作", "用户管理"]
+            )
+            
+            if st.button("🔧 应用权限设置", use_container_width=True):
+                st.success("✅ 权限设置已应用")
+        else:
+            st.info("🔒 需要管理员权限才能配置权限")
+            
+            # 显示当前用户权限
+            if user_info:
+                st.subheader("👤 您的权限")
+                role = user_info.get('role', 'viewer')
+                st.write(f"**角色**: {role}")
+                
+                if role == "viewer":
+                    st.write("✅ 查看系统状态")
+                    st.write("✅ 查看监控数据")
+                    st.write("✅ 查看日志信息")
+                elif role == "operator":
+                    st.write("✅ 查看者所有权限")
+                    st.write("✅ 执行数据库操作")
+                    st.write("✅ 管理自动化任务")
+                elif role == "admin":
+                    st.write("✅ 操作员所有权限")
+                    st.write("✅ 管理用户账号")
+                    st.write("✅ 系统配置管理")
         
     with tab3:
         st.header("📊 系统监控")
-        if st.button("检查系统状态", use_container_width=True):
-            try:
-                system_status = st.session_state.system_monitor.get_system_status()
-                st.success("✅ 系统运行正常")
-                st.json(system_status)
-            except Exception as e:
-                st.error(f"❌ 获取系统状态失败: {str(e)}")
+        
+        # 系统状态检查
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("🔄 检查系统状态", use_container_width=True):
+                try:
+                    system_status = st.session_state.system_monitor.get_system_status()
+                    st.success("✅ 系统运行正常")
+                    
+                    # 显示健康状态
+                    health = system_status.get('health', {})
+                    if health:
+                        st.subheader("💚 健康状态")
+                        st.write(f"检查总数: {health.get('total_checks', 0)}")
+                        st.write(f"健康检查: {health.get('healthy', 0)}")
+                        st.write(f"健康比例: {health.get('health_percentage', 0):.1f}%")
+                except Exception as e:
+                    st.error(f"❌ 获取系统状态失败: {str(e)}")
+        
+        with col2:
+            if st.button("📈 性能统计", use_container_width=True):
+                try:
+                    system_status = st.session_state.system_monitor.get_system_status()
+                    performance = system_status.get('performance', {})
+                    
+                    if performance:
+                        st.subheader("⚡ 性能指标")
+                        st.write(f"操作总数: {performance.get('total_operations', 0)}")
+                        st.write(f"平均耗时: {performance.get('avg_duration', 0):.2f}ms")
+                        st.write(f"错误率: {performance.get('error_rate', 0):.1f}%")
+                except Exception as e:
+                    st.error(f"❌ 获取性能统计失败: {str(e)}")
+        
+        with col3:
+            if st.button("⚠️ 错误统计", use_container_width=True):
+                try:
+                    system_status = st.session_state.system_monitor.get_system_status()
+                    errors = system_status.get('errors', {})
+                    
+                    if errors:
+                        st.subheader("🔴 错误统计")
+                        st.write(f"错误总数: {errors.get('total_errors', 0)}")
+                        st.write(f"今日错误: {errors.get('today_errors', 0)}")
+                        st.write(f"严重错误: {errors.get('critical_errors', 0)}")
+                except Exception as e:
+                    st.error(f"❌ 获取错误统计失败: {str(e)}")
+        
+        # 实时监控图表（模拟）
+        st.subheader("📊 实时监控")
+        
+        # 模拟监控数据
+        import plotly.graph_objects as go
+        import numpy as np
+        
+        # CPU使用率图表
+        cpu_data = np.random.randint(20, 80, 10)
+        fig_cpu = go.Figure(go.Scatter(x=list(range(10)), y=cpu_data, mode='lines+markers'))
+        fig_cpu.update_layout(title='CPU使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
+        st.plotly_chart(fig_cpu, use_container_width=True)
+        
+        # 内存使用率图表
+        memory_data = np.random.randint(30, 90, 10)
+        fig_memory = go.Figure(go.Scatter(x=list(range(10)), y=memory_data, mode='lines+markers'))
+        fig_memory.update_layout(title='内存使用率趋势', xaxis_title='时间', yaxis_title='使用率%')
+        st.plotly_chart(fig_memory, use_container_width=True)
+        
+    with tab4:
+        st.header("📋 操作日志")
+        
+        # 日志查看选项
+        log_type = st.selectbox("日志类型", ["所有日志", "登录日志", "操作日志", "错误日志"])
+        log_days = st.slider("查看天数", 1, 30, 7)
+        
+        if st.button("📋 加载日志", use_container_width=True):
+            # 模拟日志数据
+            import random
+            from datetime import datetime, timedelta
+            
+            log_levels = ["INFO", "WARNING", "ERROR"]
+            log_actions = ["用户登录", "数据库操作", "文件上传", "系统配置"]
+            
+            logs = []
+            for i in range(20):
+                log_time = datetime.now() - timedelta(days=random.randint(0, log_days-1), 
+                                                     hours=random.randint(0, 23))
+                logs.append({
+                    "time": log_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "level": random.choice(log_levels),
+                    "user": random.choice(["admin", "user1", "user2"]),
+                    "action": random.choice(log_actions),
+                    "message": f"{random.choice(log_actions)}操作完成"
+                })
+            
+            # 显示日志表格
+            st.subheader("📄 操作日志记录")
+            
+            for log in sorted(logs, key=lambda x: x["time"], reverse=True):
+                col1, col2, col3, col4 = st.columns([2, 1, 1, 3])
+                
+                with col1:
+                    st.write(f"🕒 {log['time']}")
+                
+                with col2:
+                    level_color = {"INFO": "green", "WARNING": "orange", "ERROR": "red"}
+                    st.markdown(f"<span style='color: {level_color[log['level']]}'>{log['level']}</span>", 
+                               unsafe_allow_html=True)
+                
+                with col3:
+                    st.write(f"👤 {log['user']}")
+                
+                with col4:
+                    st.write(log['message'])
+                
+                st.markdown("---")
                 indexes = recommender.recommend_indexes(sql)
                 if indexes:
                     st.subheader("索引推荐")

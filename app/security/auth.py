@@ -92,6 +92,36 @@ class UserManager:
         logger.info(f"用户 {username} 登录成功")
         return session_token
     
+    def register_user(self, username: str, password: str, role: str = "viewer") -> bool:
+        """注册新用户"""
+        # 验证用户名是否已存在
+        if username in self.users:
+            logger.warning(f"用户名 {username} 已存在")
+            return False
+        
+        # 验证用户名和密码格式
+        if len(username) < 3:
+            logger.warning("用户名长度至少3个字符")
+            return False
+        
+        if len(password) < 6:
+            logger.warning("密码长度至少6个字符")
+            return False
+        
+        # 创建新用户
+        self.users[username] = {
+            'username': username,
+            'password_hash': self._hash_password(password),
+            'role': role,
+            'created_at': datetime.now().isoformat(),
+            'last_login': None
+        }
+        
+        # 保存用户数据
+        self._save_users(self.users)
+        logger.info(f"用户 {username} 注册成功，角色: {role}")
+        return True
+    
     def validate_session(self, session_token: str) -> Optional[Dict[str, Any]]:
         """验证会话"""
         if session_token not in self.sessions:
@@ -292,6 +322,64 @@ class SecurityManager:
             self.audit_logger.log_event(username, 'login', '登录失败', 'failed')
         
         return session_token
+    
+    def register(self, username: str, password: str, role: str = "viewer") -> bool:
+        """用户注册"""
+        success = self.user_manager.register_user(username, password, role)
+        if success:
+            self.audit_logger.log_event(username, 'register', '用户注册成功')
+        else:
+            self.audit_logger.log_event(username, 'register', '用户注册失败', 'failed')
+        
+        return success
+    
+    def delete_user(self, username: str) -> bool:
+        """删除用户"""
+        if username not in self.user_manager.users:
+            return False
+        
+        # 不能删除当前登录用户
+        current_session = self.get_user_info(self.user_manager.sessions.get(list(self.user_manager.sessions.keys())[0]))
+        if current_session and current_session.get('username') == username:
+            return False
+        
+        # 删除用户
+        del self.user_manager.users[username]
+        self.user_manager._save_users(self.user_manager.users)
+        
+        # 删除相关会话
+        sessions_to_remove = []
+        for token, session in self.user_manager.sessions.items():
+            if session.get('username') == username:
+                sessions_to_remove.append(token)
+        
+        for token in sessions_to_remove:
+            del self.user_manager.sessions[token]
+        
+        self.audit_logger.log_event('admin', 'delete_user', f'删除用户 {username}')
+        logger.info(f"用户 {username} 已被删除")
+        return True
+    
+    def update_user_role(self, username: str, new_role: str) -> bool:
+        """更新用户角色"""
+        if username not in self.user_manager.users:
+            return False
+        
+        if new_role not in ['viewer', 'operator', 'admin']:
+            return False
+        
+        # 更新用户角色
+        self.user_manager.users[username]['role'] = new_role
+        self.user_manager._save_users(self.user_manager.users)
+        
+        # 更新相关会话
+        for session in self.user_manager.sessions.values():
+            if session.get('username') == username:
+                session['role'] = new_role
+        
+        self.audit_logger.log_event('admin', 'update_role', f'更新用户 {username} 角色为 {new_role}')
+        logger.info(f"用户 {username} 角色已更新为 {new_role}")
+        return True
     
     def logout(self, session_token: str):
         """用户登出"""
