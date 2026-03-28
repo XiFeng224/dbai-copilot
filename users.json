@@ -1,0 +1,9 @@
+{
+  "admin": {
+    "username": "admin",
+    "password_hash": "1fb62c544470141eab61f694b1c1502b745db4a462f3b34e0db4a47275a875ae:1dcfdf013bf9628f3b0b295269334020",
+    "role": "admin",
+    "created_at": "2026-03-28T10:38:40.639258",
+    "last_login": null
+  }
+}
