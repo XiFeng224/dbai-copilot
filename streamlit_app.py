@@ -27,6 +27,7 @@ from app.db_agent import (
     AIDialogue,
     AutomationManager
 )
+from app.agent_core import AgentFactory, CompetitionCoachAgent
 from app.ui_enhancement.theme import ThemeManager, NavigationManager, ResponsiveLayout
 from app.security.auth import SecurityManager
 from app.utils.error_handler import SystemMonitor
@@ -732,25 +733,98 @@ elif pages == "🎯 竞赛教练智能助手":
             height=150
         )
         
-        if st.button("🚀 开始分析", type="primary", use_container_width=True):
+        # 用户输入分析目标
+        user_goal = st.text_area(
+            "🎯 输入你的分析目标（Agent会根据目标智能调整分析重点）",
+            placeholder="例如：帮我设计一个智能图书馆管理系统，需要包含用户认证、图书检索、借阅管理功能...",
+            height=80
+        )
+        
+        if st.button("🚀 启动Agent智能分析", type="primary", use_container_width=True):
             if st.session_state.competition_docs or manual_input:
-                with st.spinner("🤖 AI Agent正在深度分析比赛需求..."):
+                # 收集所有文档内容
+                all_doc_content = ""
+                doc_names = []
+                total_chunks = 0
+                
+                for doc in st.session_state.competition_docs:
+                    doc_names.append(doc["name"])
+                    total_chunks += doc.get("chunks", 0)
+                    if doc.get("content"):
+                        all_doc_content += f"\n\n=== 文档: {doc['name']} ===\n"
+                        all_doc_content += doc["content"]
+                
+                user_input_content = manual_input if manual_input else ""
+                
+                # 创建Agent输入
+                agent_input = f"""
+                项目分析请求：
+                
+                **文档内容**：
+                {all_doc_content}
+                
+                **用户补充说明**：
+                {user_input_content}
+                
+                **用户目标**：
+                {user_goal if user_goal else "请进行完整的项目分析"}
+                """
+                
+                # 创建真正的Agent
+                with st.spinner("🤖 正在启动竞赛教练Agent..."):
+                    agent = AgentFactory.create_agent("competition_coach")
+                
+                # 智能分析进度展示（Agent执行步骤）
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                status_text.text("🤖 Agent正在规划分析目标...")
+                time.sleep(1)
+                progress_bar.progress(20)
+                
+                # Agent自发执行分析
+                status_text.text("🧠 Agent正在分析文档内容和用户需求...")
+                
+                try:
+                    # Agent自发执行任务
+                    results = agent.run(agent_input)
+                    
+                    progress_bar.progress(60)
+                    status_text.text("📋 Agent正在生成分析报告...")
+                    
+                    # 构建分析结果
+                    analysis_result = {
+                        "doc_count": len(doc_names),
+                        "total_chunks": total_chunks,
+                        "has_manual_input": bool(manual_input),
+                        "agent_results": results,
+                        "user_goal": user_goal
+                    }
+                    
+                    st.session_state.competition_analysis = analysis_result
+                    
+                    time.sleep(1)
+                    progress_bar.progress(100)
+                    status_text.text("✅ Agent分析完成！")
+                    
+                    st.success(f"✅ Agent自发完成分析！执行了{len(results)}个目标")
+                    
+                    # 显示Agent执行结果
+                    st.markdown("### 🤖 Agent执行报告")
+                    for goal, outcome in results.items():
+                        if outcome['status'] == 'completed':
+                            st.markdown(f"**✅ {goal}**")
+                            st.markdown(outcome['result'])
+                        else:
+                            st.markdown(f"**❌ {goal}**: {outcome['result']}")
+                    
+                except Exception as e:
+                    st.error(f"Agent执行失败: {str(e)}")
+                    st.info("⚠️ 使用备用分析方案...")
+                    
+                    # 备用方案：使用原有分析逻辑
                     import time
                     import re
-                    
-                    # 收集所有文档内容
-                    all_doc_content = ""
-                    doc_names = []
-                    total_chunks = 0
-                    
-                    for doc in st.session_state.competition_docs:
-                        doc_names.append(doc["name"])
-                        total_chunks += doc.get("chunks", 0)
-                        if doc.get("content"):
-                            all_doc_content += f"\n\n=== 文档: {doc['name']} ===\n"
-                            all_doc_content += doc["content"]
-                    
-                    user_input_content = manual_input if manual_input else ""
                     
                     # 智能分析进度展示（Agent执行步骤）
                     progress_bar = st.progress(0)
@@ -2013,7 +2087,7 @@ elif pages == "🎯 竞赛教练智能助手":
                 return response
             except Exception as e:
                 # 如果LLM调用失败，使用备用响应
-                logger.error(f"LLM调用失败: {e}")
+                print(f"LLM调用失败: {e}")
                 return f"""
                 🤖 **竞赛教练建议**
                 
