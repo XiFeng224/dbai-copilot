@@ -56,29 +56,90 @@ if not st.session_state.authenticated:
     st.markdown("""
     <style>
     .login-container {
-        max-width: 500px;
+        max-width: 800px;
         margin: 0 auto;
+        padding: 0;
+    }
+    .login-main {
+        display: flex;
+        gap: 30px;
         padding: 40px;
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        border: 1px solid #e1e8ed;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid #f0f4f8;
+    }
+    .login-left {
+        flex: 1;
+        min-width: 300px;
+    }
+    .login-right {
+        flex: 1;
+        min-width: 300px;
+        padding-left: 30px;
+        border-left: 1px solid #e8eff5;
     }
     .login-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+    }
+    .login-logo {
+        font-size: 3rem;
+        margin-bottom: 15px;
     }
     .login-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
     }
     .login-subtitle {
-        color: #7f8c8d;
-        font-size: 1.1rem;
+        color: #64748b;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    .feature-card {
+        padding: 16px;
+        margin-bottom: 12px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .feature-card:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+    .feature-icon {
+        font-size: 1.3rem;
+        margin-bottom: 4px;
+    }
+    .feature-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+    }
+    .feature-desc {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-top: 2px;
+    }
+    .quick-login-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 20px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        text-align: center;
+    }
+    .footer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -89,150 +150,254 @@ if not st.session_state.authenticated:
     # 登录标题
     st.markdown('''
     <div class="login-header">
-        <div class="login-title">🔐 DBAI-Copilot</div>
-        <div class="login-subtitle">数据库AI助手 - 智能运维平台</div>
+        <div class="login-logo">🤖</div>
+        <div class="login-title">DBAI-Copilot</div>
+        <div class="login-subtitle">数据库AI助手 · 智能运维平台</div>
     </div>
     ''', unsafe_allow_html=True)
+    
+    # 登录主体 - 左右布局
+    st.markdown('<div class="login-main">', unsafe_allow_html=True)
+    
+    # 左侧 - 登录/注册表单
+    st.markdown('<div class="login-left">', unsafe_allow_html=True)
     
     # 登录和注册选项卡
     tab1, tab2 = st.tabs(["🔑 用户登录", "📝 用户注册"])
     
     with tab1:
-        st.subheader("🔑 用户登录")
+        st.markdown('<div style="padding: 10px 0;">', unsafe_allow_html=True)
         
-        col1, col2 = st.columns([1, 1])
+        username = st.text_input("👤 用户名", placeholder="请输入用户名", key="login_username")
+        password = st.text_input("🔒 密码", type="password", placeholder="请输入密码", key="login_password")
         
-        with col1:
-            username = st.text_input("👤 用户名", placeholder="请输入用户名", key="login_username")
-            password = st.text_input("🔒 密码", type="password", placeholder="请输入密码", key="login_password")
-            
-            # 登录按钮
-            if st.button("🚀 登录系统", type="primary", use_container_width=True):
-                if username and password:
-                    session_token = st.session_state.security_manager.login(username, password)
-                    if session_token:
-                        st.session_state.authenticated = True
-                        st.session_state.session_token = session_token
-                        st.session_state.username = username
-                        st.rerun()
-                    else:
-                        st.error("❌ 用户名或密码错误")
+        # 登录按钮
+        if st.button("🚀 登录系统", type="primary", use_container_width=True):
+            if username and password:
+                session_token = st.session_state.security_manager.login(username, password)
+                if session_token:
+                    st.session_state.authenticated = True
+                    st.session_state.session_token = session_token
+                    st.session_state.username = username
+                    st.rerun()
                 else:
-                    st.warning("⚠️ 请输入用户名和密码")
-            
-            # 记住我
-            st.checkbox("记住登录状态", value=True)
+                    st.error("❌ 用户名或密码错误")
+            else:
+                st.warning("⚠️ 请输入用户名和密码")
         
-        with col2:
-            st.markdown("### 📋 快速登录")
-            
-            # 默认账户卡片
-            with st.container():
-                st.markdown("#### 👤 默认账户")
-                st.markdown("""
-                **用户名**: admin  
-                **密码**: admin123
-                """)
-                
-                if st.button("⚡ 快速登录", key="quick_login", use_container_width=True):
-                    session_token = st.session_state.security_manager.login("admin", "admin123")
-                    if session_token:
-                        st.session_state.authenticated = True
-                        st.session_state.session_token = session_token
-                        st.session_state.username = "admin"
-                        st.rerun()
+        # 记住我
+        st.checkbox("记住登录状态", value=True)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with tab2:
-        st.subheader("📝 用户注册")
+        st.markdown('<div style="padding: 10px 0;">', unsafe_allow_html=True)
         
-        col1, col2 = st.columns([1, 1])
+        new_username = st.text_input("👤 新用户名", placeholder="请输入3-20位用户名", key="register_username")
+        new_password = st.text_input("🔒 设置密码", type="password", placeholder="请输入6位以上密码", key="register_password")
+        confirm_password = st.text_input("🔒 确认密码", type="password", placeholder="请再次输入密码", key="confirm_password")
         
-        with col1:
-            new_username = st.text_input("👤 新用户名", placeholder="请输入3-20位用户名", key="register_username")
-            new_password = st.text_input("🔒 设置密码", type="password", placeholder="请输入6位以上密码", key="register_password")
-            confirm_password = st.text_input("🔒 确认密码", type="password", placeholder="请再次输入密码", key="confirm_password")
-            
-            # 用户角色选择
-            user_role = st.selectbox("🎯 用户角色", ["viewer", "operator", "admin"], 
-                                    format_func=lambda x: {"viewer": "👀 查看者", "operator": "⚙️ 操作员", "admin": "👑 管理员"}[x])
-            
-            # 注册按钮
-            if st.button("✅ 注册账号", type="primary", use_container_width=True):
-                if new_username and new_password and confirm_password:
-                    if len(new_username) < 3:
-                        st.error("❌ 用户名长度至少3个字符")
-                    elif len(new_password) < 6:
-                        st.error("❌ 密码长度至少6个字符")
-                    elif new_password != confirm_password:
-                        st.error("❌ 两次输入的密码不一致")
-                    else:
-                        success = st.session_state.security_manager.register(new_username, new_password, user_role)
-                        if success:
-                            st.success("✅ 账号注册成功！请使用新账号登录")
-                            # 清空输入框
-                            st.session_state.register_username = ""
-                            st.session_state.register_password = ""
-                            st.session_state.confirm_password = ""
-                        else:
-                            st.error("❌ 注册失败，用户名可能已存在")
+        # 用户角色选择
+        user_role = st.selectbox("🎯 用户角色", ["viewer", "operator", "admin"], 
+                                format_func=lambda x: {"viewer": "👀 查看者", "operator": "⚙️ 操作员", "admin": "👑 管理员"}[x])
+        
+        # 注册按钮
+        if st.button("✅ 注册账号", type="primary", use_container_width=True):
+            if new_username and new_password and confirm_password:
+                if len(new_username) < 3:
+                    st.error("❌ 用户名长度至少3个字符")
+                elif len(new_password) < 6:
+                    st.error("❌ 密码长度至少6个字符")
+                elif new_password != confirm_password:
+                    st.error("❌ 两次输入的密码不一致")
                 else:
-                    st.warning("⚠️ 请填写完整的注册信息")
+                    success = st.session_state.security_manager.register(new_username, new_password, user_role)
+                    if success:
+                        st.success("✅ 账号注册成功！请使用新账号登录")
+                        st.session_state.register_username = ""
+                        st.session_state.register_password = ""
+                        st.session_state.confirm_password = ""
+                    else:
+                        st.error("❌ 注册失败，用户名可能已存在")
+            else:
+                st.warning("⚠️ 请填写完整的注册信息")
         
-        with col2:
-            st.markdown("### 💡 角色说明")
-            
-            with st.container():
-                st.markdown("#### 👀 查看者")
-                st.markdown("""
-                - 查看系统状态
-                - 查看监控数据
-                - 查看日志信息
-                """)
-            
-            st.markdown("---")
-            
-            with st.container():
-                st.markdown("#### ⚙️ 操作员")
-                st.markdown("""
-                - 查看者所有权限
-                - 执行数据库操作
-                - 管理自动化任务
-                """)
-            
-            st.markdown("---")
-            
-            with st.container():
-                st.markdown("#### 👑 管理员")
-                st.markdown("""
-                - 操作员所有权限
-                - 管理用户账号
-                - 系统配置管理
-                """)
+        st.markdown('</div>', unsafe_allow_html=True)
     
-    # 功能特色
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 右侧 - 功能特色和快速登录
+    st.markdown('<div class="login-right">', unsafe_allow_html=True)
+    
+    # 功能特色卡片
+    st.markdown("### ✨ 核心功能")
+    
+    features = [
+        ("🤖", "AI智能对话", "自然语言问答，智能诊断报告"),
+        ("📊", "实时监控", "性能指标采集，慢查询管理"),
+        ("🔍", "智能诊断", "执行计划分析，锁等待检测"),
+        ("⚡", "自动优化", "索引推荐，SQL优化，参数调优"),
+        ("🔒", "安全可靠", "完整的用户认证和权限管理")
+    ]
+    
+    for icon, title, desc in features:
+        st.markdown(f'''
+        <div class="feature-card">
+            <div class="feature-icon">{icon}</div>
+            <div class="feature-title">{title}</div>
+            <div class="feature-desc">{desc}</div>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    # 快速登录卡片
     st.markdown("---")
-    st.markdown("### 💡 平台特色")
+    st.markdown('<div class="quick-login-card">', unsafe_allow_html=True)
+    st.markdown("### 👤 快速登录")
     st.markdown("""
-    - 🤖 AI智能对话
-    - 📊 实时监控
-    - 🔍 智能诊断
-    - ⚡ 自动优化
-    - 🔒 安全可靠
+    **用户名**: `admin`  
+    **密码**: `admin123`
     """)
     
+    if st.button("⚡ 一键登录", key="quick_login", use_container_width=True):
+        session_token = st.session_state.security_manager.login("admin", "admin123")
+        if session_token:
+            st.session_state.authenticated = True
+            st.session_state.session_token = session_token
+            st.session_state.username = "admin"
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     # 底部信息
-    st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; color: #7f8c8d; font-size: 0.9rem;">
-        <strong>数据库AI助手 - DBAI-Copilot</strong> | 版本 1.0.0 | 技术支持
+    st.markdown('''
+    <div class="footer">
+        <strong>DBAI-Copilot</strong> · 数据库AI助手 · 版本 1.0.0
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.stop()
 
 # 主应用界面
+st.markdown("""
+<style>
+/* 全局样式优化 */
+.main {
+    padding: 1rem 2rem;
+}
+
+/* 侧边栏优化 */
+.css-1d391kg {
+    padding-top: 2rem;
+}
+
+/* 卡片样式 */
+.card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    border-color: #cbd5e1;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+}
+
+.card-desc {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* 特色卡片 */
+.feature-card {
+    padding: 1.2rem;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+}
+
+.feature-icon-large {
+    font-size: 2rem;
+    margin-bottom: 0.6rem;
+}
+
+.feature-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.feature-desc {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* 欢迎标题 */
+.welcome-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.welcome-main-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+}
+
+/* 侧边栏用户卡片 */
+.sidebar-user-card {
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+/* 分隔线 */
+.section-divider {
+    margin: 2.5rem 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+    border: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 NavigationManager.create_breadcrumb("主控制台")
 
 # 添加欢迎页面选项到导航栏
@@ -243,12 +408,16 @@ pages = st.sidebar.selectbox(
 
 # 侧边栏用户信息
 with st.sidebar:
-    st.markdown("---")
+    st.markdown("""
+    <div class="sidebar-user-card">
+    """, unsafe_allow_html=True)
     st.markdown(f"**👤 当前用户:** {st.session_state.username}")
     
     user_info = st.session_state.security_manager.get_user_info(st.session_state.session_token)
     if user_info:
-        st.markdown(f"**🎯 角色:** {user_info['role']}")
+        role_emoji = {"viewer": "👀", "operator": "⚙️", "admin": "👑"}.get(user_info['role'], "👤")
+        st.markdown(f"**{role_emoji} 角色:** {user_info['role']}")
+    st.markdown("</div>", unsafe_allow_html=True)
     
     # 快速操作按钮
     st.markdown("---")
@@ -274,77 +443,116 @@ with st.sidebar:
 
 # 主页面内容
 if pages == "🏠 欢迎页面":
-    st.title("🎉 欢迎使用数据库AI助手 - DBAI-Copilot")
-    st.markdown("---")
+    # 欢迎标题
+    st.markdown("""
+    <div class="welcome-title">
+        <div class="welcome-main-title">🎉 欢迎使用 DBAI-Copilot</div>
+        <div class="welcome-subtitle">数据库AI助手 · 智能运维平台</div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # 项目介绍
-    col1, col2 = st.columns([2, 1])
+    # 项目介绍卡片
+    col1, col2 = st.columns([1.5, 1])
     
     with col1:
         st.markdown("""
-        ### 📋 项目概述
-        **DBAI-Copilot** 是一个集成了「竞赛教练智能助手」和「数据库运维智能助手」的双重功能智能系统，
-        为计算机设计大赛和企业级数据库运维提供AI驱动的智能辅助。
-        
-        ### 🎯 核心功能
-        - **🎯 竞赛教练智能助手** - 帮助参赛团队快速理解比赛需求，生成完整的技术方案
-        - **🛠️ 数据库运维智能助手** - 提供智能化的数据库监控、诊断分析和自动化运维
-        - **🤖 AI智能分析** - 结合RAG技术和机器学习算法实现智能分析
-        - **🔒 安全可靠** - 完整的用户认证和权限管理系统
-        """)
+        <div class="card">
+            <div class="card-icon">📋</div>
+            <div class="card-title">项目概述</div>
+            <div class="card-desc">
+                DBAI-Copilot 是一个集成了「竞赛教练智能助手」和「数据库运维智能助手」的双重功能智能系统，
+                为计算机设计大赛和企业级数据库运维提供AI驱动的智能辅助。
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.image("https://via.placeholder.com/200x200/2c3e50/ffffff?text=DBAI-Copilot", 
-                caption="数据库AI助手", width=200)
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">🎯</div>
+            <div class="card-title">核心功能</div>
+            <div class="card-desc">
+                • 竞赛教练智能助手 - 帮助参赛团队快速理解比赛需求<br>
+                • 数据库运维智能助手 - 提供智能化的数据库监控和诊断<br>
+                • AI智能分析 - 结合RAG技术和机器学习算法<br>
+                • 安全可靠 - 完整的用户认证和权限管理系统
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
     
     # 功能卡片
-    st.markdown("---")
     st.markdown("### 🚀 快速开始")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        with st.container():
-            st.markdown("### 🎯 竞赛教练")
-            st.markdown("上传比赛需求文档，智能生成技术方案和答辩材料")
-            if st.button("开始使用", key="start_competition"):
-                st.session_state.page = "竞赛教练智能助手"
-                st.rerun()
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">🎯</div>
+            <div class="card-title">竞赛教练</div>
+            <div class="card-desc">
+                上传比赛需求文档，智能生成技术方案和答辩材料
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("开始使用", key="start_competition", use_container_width=True):
+            st.session_state.page = "竞赛教练智能助手"
+            st.rerun()
     
     with col2:
-        with st.container():
-            st.markdown("### 🛠️ 数据库运维")
-            st.markdown("实时监控、智能诊断、自动化优化数据库性能")
-            if st.button("开始使用", key="start_database"):
-                st.session_state.page = "数据库运维智能助手"
-                st.rerun()
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">🛠️</div>
+            <div class="card-title">数据库运维</div>
+            <div class="card-desc">
+                实时监控、智能诊断、自动化优化数据库性能
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("开始使用", key="start_database", use_container_width=True):
+            st.session_state.page = "数据库运维智能助手"
+            st.rerun()
     
     with col3:
-        with st.container():
-            st.markdown("### ⚙️ 系统管理")
-            st.markdown("用户管理、权限控制、系统监控和日志查看")
-            if st.button("开始使用", key="start_management"):
-                st.session_state.page = "系统管理"
-                st.rerun()
+        st.markdown("""
+        <div class="card">
+            <div class="card-icon">⚙️</div>
+            <div class="card-title">系统管理</div>
+            <div class="card-desc">
+                用户管理、权限控制、系统监控和日志查看
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("开始使用", key="start_management", use_container_width=True):
+            st.session_state.page = "系统管理"
+            st.rerun()
+    
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
     
     # 技术特色
-    st.markdown("---")
     st.markdown("### 💡 技术特色")
     
     tech_features = [
-        ("🔗 双重功能集成", "竞赛辅助与数据库运维完美结合"),
-        ("🧠 AI智能驱动", "RAG技术 + 机器学习预测分析"),
-        ("🌐 多数据库支持", "MySQL、PostgreSQL、SQL Server统一接口"),
-        ("🎨 现代化界面", "Streamlit响应式Web应用"),
-        ("⚡ 自动化运维", "定时任务调度和智能优化"),
-        ("🔒 安全可靠", "完整的用户认证和权限管理")
+        ("🔗", "双重功能集成", "竞赛辅助与数据库运维完美结合"),
+        ("🧠", "AI智能驱动", "RAG技术 + 机器学习预测分析"),
+        ("🌐", "多数据库支持", "MySQL、PostgreSQL、SQL Server统一接口"),
+        ("🎨", "现代化界面", "Streamlit响应式Web应用"),
+        ("⚡", "自动化运维", "定时任务调度和智能优化"),
+        ("🔒", "安全可靠", "完整的用户认证和权限管理")
     ]
     
     cols = st.columns(3)
-    for i, (icon, desc) in enumerate(tech_features):
+    for i, (icon, title, desc) in enumerate(tech_features):
         with cols[i % 3]:
-            st.markdown(f"**{icon} {desc.split(' - ')[0]}**")
-            st.markdown(f"<small>{desc.split(' - ')[1] if ' - ' in desc else desc}</small>", unsafe_allow_html=True)
+            st.markdown(f'''
+            <div class="feature-card">
+                <div class="feature-icon-large">{icon}</div>
+                <div class="feature-title">{title}</div>
+                <div class="feature-desc">{desc}</div>
+            </div>
+            ''', unsafe_allow_html=True)
 
 elif pages == "🎯 竞赛教练智能助手":
     st.title("🎯 竞赛教练智能助手")
