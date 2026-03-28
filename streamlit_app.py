@@ -212,20 +212,17 @@ elif pages == "🎯 竞赛教练智能助手":
 elif pages == "🛠️ 数据库运维智能助手":
     st.title("🛠️ 数据库运维智能助手")
     st.caption("实时监控、诊断分析、智能优化、AI对话、自动化运维")
-else:
-    st.title("⚙️ 系统管理")
-    st.caption("用户管理、权限控制、系统监控、日志查看")
     
     # 数据库连接配置
     with st.sidebar:
-        st.header("数据库连接配置")
+        st.header("🔗 数据库连接配置")
         db_type = st.selectbox("数据库类型", ["MySQL", "PostgreSQL", "SQL Server"])
         host = st.text_input("主机", "localhost")
         port = st.number_input("端口", 1, 65535, DatabaseFactory.get_default_ports().get(db_type, 3306))
         user = st.text_input("用户名", "root")
         password = st.text_input("密码", "", type="password")
         database = st.text_input("数据库", "")
-        connect_btn = st.button("连接数据库")
+        connect_btn = st.button("连接数据库", use_container_width=True)
     
     # 初始化数据库连接
     if "db_connection" not in st.session_state:
@@ -242,28 +239,28 @@ else:
         try:
             st.session_state.db_connection = DatabaseFactory.create_connection(db_type, host, port, user, password, database)
             if st.session_state.db_connection.connect():
-                st.success(f"{db_type}数据库连接成功！")
+                st.success(f"✅ {db_type}数据库连接成功！")
                 st.session_state.metrics_collector = MetricsCollector(st.session_state.db_connection)
                 st.session_state.ai_dialogue = AIDialogue(st.session_state.db_connection)
                 
                 # 显示数据库信息
                 db_info = st.session_state.db_connection.get_database_info()
-                st.info(f"数据库类型: {db_info.get('type', 'Unknown')}, 版本: {db_info.get('version', 'Unknown')}")
+                st.info(f"📊 数据库类型: {db_info.get('type', 'Unknown')}, 版本: {db_info.get('version', 'Unknown')}")
                 
                 # 初始化自动化管理器
                 st.session_state.automation_manager = AutomationManager(st.session_state.db_connection)
             else:
-                st.error("数据库连接失败，请检查配置！")
+                st.error("❌ 数据库连接失败，请检查配置！")
         except Exception as e:
-            st.error(f"创建数据库连接时出错: {str(e)}")
+            st.error(f"❌ 创建数据库连接时出错: {str(e)}")
     
     # 功能选项卡
     if st.session_state.db_connection:
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["实时监控", "诊断分析", "智能优化", "AI对话", "自动化运维"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 实时监控", "🔍 诊断分析", "⚡ 智能优化", "🤖 AI对话", "🔄 自动化运维"])
         
         with tab1:
-            st.header("实时性能监控")
-            if st.button("采集指标"):
+            st.header("📊 实时性能监控")
+            if st.button("采集指标", use_container_width=True):
                 metrics = st.session_state.metrics_collector.collect()
                 col1, col2, col3 = st.columns(3)
                 with col1:
@@ -280,9 +277,9 @@ else:
                     st.metric("最大连接数", f"{connections.get('max', 0)}")
         
         with tab2:
-            st.header("诊断分析")
+            st.header("🔍 诊断分析")
             sql = st.text_area("输入SQL语句", "SELECT * FROM orders WHERE status='pending'", key="diagnosis_sql")
-            if st.button("分析执行计划", key="analyze_plan"):
+            if st.button("分析执行计划", key="analyze_plan", use_container_width=True):
                 visualizer = ExplainVisualizer(st.session_state.db_connection)
                 plan = visualizer.visualize_explain(sql)
                 st.json(plan)
@@ -293,10 +290,97 @@ else:
                         st.write(f"- {suggestion}")
         
         with tab3:
-            st.header("智能优化")
+            st.header("⚡ 智能优化")
             sql = st.text_area("输入SQL语句", "SELECT * FROM orders WHERE status='pending'", key="optimization_sql")
-            if st.button("推荐索引", key="recommend_index"):
+            if st.button("推荐索引", key="recommend_index", use_container_width=True):
                 recommender = IndexRecommender(st.session_state.db_connection)
+                
+        with tab4:
+            st.header("🤖 AI对话助手")
+            st.markdown("与数据库AI助手进行智能对话，获取优化建议和问题诊断")
+            
+            # 初始化对话历史
+            if "chat_messages" not in st.session_state:
+                st.session_state.chat_messages = []
+            
+            # 显示对话历史
+            for message in st.session_state.chat_messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+            
+            # 用户输入
+            if prompt := st.chat_input("请输入您的问题..."):
+                # 添加用户消息
+                st.session_state.chat_messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+                
+                # AI回复
+                with st.chat_message("assistant"):
+                    with st.spinner("AI助手正在思考..."):
+                        try:
+                            response = st.session_state.ai_dialogue.ask_question(prompt)
+                            st.markdown(response)
+                            st.session_state.chat_messages.append({"role": "assistant", "content": response})
+                        except Exception as e:
+                            error_msg = f"抱歉，AI助手暂时无法回答：{str(e)}"
+                            st.error(error_msg)
+                            st.session_state.chat_messages.append({"role": "assistant", "content": error_msg})
+            
+            # 快速问题示例
+            st.markdown("---")
+            st.subheader("💡 快速问题示例")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("数据库性能如何？", use_container_width=True):
+                    st.session_state.chat_messages.append({"role": "user", "content": "数据库性能如何？"})
+                    st.rerun()
+                
+                if st.button("有哪些慢查询？", use_container_width=True):
+                    st.session_state.chat_messages.append({"role": "user", "content": "有哪些慢查询？"})
+                    st.rerun()
+            
+            with col2:
+                if st.button("如何优化索引？", use_container_width=True):
+                    st.session_state.chat_messages.append({"role": "user", "content": "如何优化索引？"})
+                    st.rerun()
+                
+                if st.button("数据库安全建议", use_container_width=True):
+                    st.session_state.chat_messages.append({"role": "user", "content": "数据库安全建议"})
+                    st.rerun()
+        
+        with tab5:
+            st.header("🔄 自动化运维")
+            if st.button("设置自动化任务", use_container_width=True):
+                st.session_state.automation_manager.setup_default_tasks()
+                st.success("✅ 默认自动化任务已设置")
+    else:
+        st.info("🔗 请在左侧配置数据库连接信息以开始使用功能")
+else:
+    st.title("⚙️ 系统管理")
+    st.caption("用户管理、权限控制、系统监控、日志查看")
+    
+    # 系统管理功能
+    tab1, tab2, tab3 = st.tabs(["👥 用户管理", "🔒 权限控制", "📊 系统监控"])
+    
+    with tab1:
+        st.header("👥 用户管理")
+        st.info("用户管理功能正在开发中...")
+        
+    with tab2:
+        st.header("🔒 权限控制")
+        st.info("权限控制功能正在开发中...")
+        
+    with tab3:
+        st.header("📊 系统监控")
+        if st.button("检查系统状态", use_container_width=True):
+            try:
+                system_status = st.session_state.system_monitor.get_system_status()
+                st.success("✅ 系统运行正常")
+                st.json(system_status)
+            except Exception as e:
+                st.error(f"❌ 获取系统状态失败: {str(e)}")
                 indexes = recommender.recommend_indexes(sql)
                 if indexes:
                     st.subheader("索引推荐")
