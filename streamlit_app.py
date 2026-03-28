@@ -1317,136 +1317,306 @@ elif pages == "🎯 竞赛教练智能助手":
             
             if st.button("🚀 AI智能生成方案", type="primary", use_container_width=True):
                 with st.spinner("🎯 AI正在生成专业技术方案..."):
+                    # 检查是否有可用的LLM
+                    has_llm = False
                     try:
-                        # 构建AI方案生成提示词
-                        plan_prompt = f"""
-                        请作为专业的计算机设计大赛技术顾问，为参赛团队生成一份{plan_type}。
+                        from config import OPENAI_API_KEY, LLM_PROVIDER
+                        if LLM_PROVIDER == "openai" and OPENAI_API_KEY.strip():
+                            has_llm = True
+                        elif LLM_PROVIDER == "ollama":
+                            has_llm = True
+                    except:
+                        pass
+                    
+                    if has_llm:
+                        try:
+                            # 构建AI方案生成提示词
+                            plan_prompt = f"""
+                            请作为专业的计算机设计大赛技术顾问，为参赛团队生成一份{plan_type}。
+                            
+                            项目背景：
+                            - 项目名称：DB-AI Copilot - 智能数据库运维与竞赛辅助系统
+                            - 核心功能：竞赛教练智能助手 + 数据库运维智能助手
+                            - 参赛目标：参加计算机设计大赛并取得优异成绩
+                            
+                            团队配置：{team_size}
+                            重点关注：{', '.join(focus_options)}
+                            
+                            请生成一份完整的技术方案，包含以下内容：
+                            
+                            ## 1. 📋 项目概述
+                            - 项目背景与意义
+                            - 核心价值与创新点
+                            - 项目目标与定位
+                            
+                            ## 2. 🏗️ 系统架构设计
+                            - 整体架构图（文字描述）
+                            - 各模块职责说明
+                            - 技术选型理由
+                            
+                            ## 3. 💻 技术实现方案
+                            - 前端技术栈与实现
+                            - 后端技术栈与实现
+                            - 数据库设计
+                            - AI功能集成方案
+                            
+                            ## 4. 👥 团队分工与开发计划
+                            - 团队成员角色分配（基于{team_size}）
+                            - 详细的开发里程碑
+                            - 每周任务安排
+                            - 风险评估与应对
+                            
+                            ## 5. 🎯 竞赛亮点设计
+                            - 技术创新点
+                            - 应用创新点
+                            - 演示亮点
+                            - 答辩策略
+                            
+                            ## 6. 📊 部署与测试
+                            - 部署方案
+                            - 测试策略
+                            - 性能优化建议
+                            
+                            请提供具体、详细、可操作的方案，用清晰的结构、专业的语言、具体的例子。
+                            突出竞赛相关的亮点和创新点，帮助团队在比赛中取得好成绩。
+                            """
+                            
+                            # 调用真实LLM生成方案
+                            from app.llm import invoke_llm
+                            plan_result = invoke_llm(plan_prompt)
+                            
+                            st.success("✅ AI技术方案生成完成！")
+                            
+                            # 保存生成的方案
+                            st.session_state.generated_plan = {
+                                "type": plan_type,
+                                "content": plan_result,
+                                "team_size": team_size,
+                                "focus": focus_options
+                            }
+                            
+                            # 显示生成的方案
+                            with st.expander("📄 完整技术方案", expanded=True):
+                                st.markdown(plan_result)
+                            
+                        except Exception as e:
+                            st.error(f"方案生成失败: {str(e)}")
+                            st.info("基于分析结果生成备用方案...")
+                            
+                            # 基于分析结果动态生成备用方案
+                            analysis = st.session_state.competition_analysis
+                            tech_stack = analysis.get("tech_stack", [])
+                            features = analysis.get("features", [])
+                            doc_count = analysis.get("doc_count", 0)
+                            
+                            # 构建技术栈部分
+                            tech_stack_str = "\n".join([f"- {tech}" for tech in tech_stack])
+                            
+                            # 构建功能部分
+                            features_str = "\n".join([f"{i+1}. {feature.split(' - ')[0]}" for i, feature in enumerate(features[:8])])
+                            
+                            # 构建开发计划
+                            week_count = 6 if len(tech_stack) > 8 else 5
+                            dev_plan = ""
+                            for week in range(1, week_count + 1):
+                                if week == 1:
+                                    dev_plan += f"- **第{week}周**：需求分析、环境搭建、技术选型\n"
+                                elif week == 2:
+                                    dev_plan += f"- **第{week}周**：数据库设计、核心API开发\n"
+                                elif week == 3:
+                                    dev_plan += f"- **第{week}周**：前端界面开发、基础功能实现\n"
+                                elif week == 4:
+                                    dev_plan += f"- **第{week}周**：AI功能集成、智能分析\n"
+                                elif week == 5:
+                                    dev_plan += f"- **第{week}周**：监控系统、优化改进\n"
+                                elif week == 6:
+                                    dev_plan += f"- **第{week}周**：测试、文档、Demo准备\n"
+                            
+                            # 构建团队分工
+                            team_members = []
+                            if team_size == "2-3人":
+                                team_members = ["全栈开发（1人）", "AI/数据库（1-2人）"]
+                            elif team_size == "4-5人":
+                                team_members = ["前端开发（1人）", "后端开发（2人）", "AI/数据库（1人）", "测试/文档（1人）"]
+                            else:
+                                team_members = ["前端开发（1-2人）", "后端开发（2-3人）", "AI/数据库（1-2人）", "测试/文档（1-2人）"]
+                            
+                            team_str = "\n".join([f"- {member}" for member in team_members])
+                            
+                            # 构建创新点
+                            innovation_points = []
+                            if "AI" in str(tech_stack) or "OpenAI" in str(tech_stack):
+                                innovation_points.append("AI智能驱动的分析和优化")
+                            if "数据库" in str(tech_stack) or "MySQL" in str(tech_stack):
+                                innovation_points.append("多数据库统一管理和智能运维")
+                            if "实时" in str(tech_stack) or "WebSocket" in str(tech_stack):
+                                innovation_points.append("实时监控和智能告警")
+                            innovation_points.append("竞赛教练与数据库运维双重功能集成")
+                            innovation_points.append("文档智能解析和需求分析")
+                            
+                            innovation_str = "\n".join([f"- {point}" for point in innovation_points])
+                            
+                            # 生成完整的备用方案
+                            backup_plan = f"""# 📋 智能技术方案（基于文档分析生成）
+
+## 1. 项目概述
+
+### 项目背景
+基于{doc_count}份文档分析，本项目旨在打造一个智能辅助系统，解决实际业务需求并参加计算机设计大赛。
+
+### 核心价值
+- **智能分析**：自动解析需求，识别技术要求
+- **双重功能**：竞赛教练 + 专业数据库运维
+- **高效开发**：降低技术门槛，提升开发效率
+
+## 2. 技术架构
+
+### 推荐技术栈
+{tech_stack_str}
+
+### 系统架构设计
+- 前端层：Web交互界面
+- 业务层：核心功能实现
+- 数据层：数据存储和管理
+- AI层：智能分析和优化
+
+## 3. 功能规划
+
+### 核心功能模块
+{features_str}
+
+## 4. 团队分工与开发计划
+
+### 团队配置（{team_size}）
+{team_str}
+
+### 开发计划（{week_count}周）
+{dev_plan}
+
+## 5. 竞赛亮点
+
+### 创新点
+{innovation_str}
+
+### 答辩策略
+- 突出技术栈的合理性和先进性
+- 展示功能的实用性和完整性
+- 强调团队协作和项目管理能力
+"""
+                            
+                            st.session_state.generated_plan = {
+                                "type": plan_type,
+                                "content": backup_plan,
+                                "team_size": team_size,
+                                "focus": focus_options
+                            }
+                            
+                            st.success("✅ 基于分析结果的备用方案生成完成！")
+                            with st.expander("📄 技术方案", expanded=True):
+                                st.markdown(backup_plan)
+                    else:
+                        st.info("⚠️ 未检测到LLM配置，基于分析结果生成备用方案")
                         
-                        项目背景：
-                        - 项目名称：DB-AI Copilot - 智能数据库运维与竞赛辅助系统
-                        - 核心功能：竞赛教练智能助手 + 数据库运维智能助手
-                        - 参赛目标：参加计算机设计大赛并取得优异成绩
+                        # 基于分析结果动态生成备用方案
+                        analysis = st.session_state.competition_analysis
+                        tech_stack = analysis.get("tech_stack", [])
+                        features = analysis.get("features", [])
+                        doc_count = analysis.get("doc_count", 0)
                         
-                        团队配置：{team_size}
-                        重点关注：{', '.join(focus_options)}
+                        # 构建技术栈部分
+                        tech_stack_str = "\n".join([f"- {tech}" for tech in tech_stack])
                         
-                        请生成一份完整的技术方案，包含以下内容：
+                        # 构建功能部分
+                        features_str = "\n".join([f"{i+1}. {feature.split(' - ')[0]}" for i, feature in enumerate(features[:8])])
                         
-                        ## 1. 📋 项目概述
-                        - 项目背景与意义
-                        - 核心价值与创新点
-                        - 项目目标与定位
+                        # 构建开发计划
+                        week_count = 6 if len(tech_stack) > 8 else 5
+                        dev_plan = ""
+                        for week in range(1, week_count + 1):
+                            if week == 1:
+                                dev_plan += f"- **第{week}周**：需求分析、环境搭建、技术选型\n"
+                            elif week == 2:
+                                dev_plan += f"- **第{week}周**：数据库设计、核心API开发\n"
+                            elif week == 3:
+                                dev_plan += f"- **第{week}周**：前端界面开发、基础功能实现\n"
+                            elif week == 4:
+                                dev_plan += f"- **第{week}周**：AI功能集成、智能分析\n"
+                            elif week == 5:
+                                dev_plan += f"- **第{week}周**：监控系统、优化改进\n"
+                            elif week == 6:
+                                dev_plan += f"- **第{week}周**：测试、文档、Demo准备\n"
                         
-                        ## 2. 🏗️ 系统架构设计
-                        - 整体架构图（文字描述）
-                        - 各模块职责说明
-                        - 技术选型理由
+                        # 构建团队分工
+                        team_members = []
+                        if team_size == "2-3人":
+                            team_members = ["全栈开发（1人）", "AI/数据库（1-2人）"]
+                        elif team_size == "4-5人":
+                            team_members = ["前端开发（1人）", "后端开发（2人）", "AI/数据库（1人）", "测试/文档（1人）"]
+                        else:
+                            team_members = ["前端开发（1-2人）", "后端开发（2-3人）", "AI/数据库（1-2人）", "测试/文档（1-2人）"]
                         
-                        ## 3. 💻 技术实现方案
-                        - 前端技术栈与实现
-                        - 后端技术栈与实现
-                        - 数据库设计
-                        - AI功能集成方案
+                        team_str = "\n".join([f"- {member}" for member in team_members])
                         
-                        ## 4. 👥 团队分工与开发计划
-                        - 团队成员角色分配（基于{team_size}）
-                        - 详细的开发里程碑
-                        - 每周任务安排
-                        - 风险评估与应对
+                        # 构建创新点
+                        innovation_points = []
+                        if "AI" in str(tech_stack) or "OpenAI" in str(tech_stack):
+                            innovation_points.append("AI智能驱动的分析和优化")
+                        if "数据库" in str(tech_stack) or "MySQL" in str(tech_stack):
+                            innovation_points.append("多数据库统一管理和智能运维")
+                        if "实时" in str(tech_stack) or "WebSocket" in str(tech_stack):
+                            innovation_points.append("实时监控和智能告警")
+                        innovation_points.append("竞赛教练与数据库运维双重功能集成")
+                        innovation_points.append("文档智能解析和需求分析")
                         
-                        ## 5. 🎯 竞赛亮点设计
-                        - 技术创新点
-                        - 应用创新点
-                        - 演示亮点
-                        - 答辩策略
+                        innovation_str = "\n".join([f"- {point}" for point in innovation_points])
                         
-                        ## 6. 📊 部署与测试
-                        - 部署方案
-                        - 测试策略
-                        - 性能优化建议
-                        
-                        请提供具体、详细、可操作的方案，用清晰的结构、专业的语言、具体的例子。
-                        突出竞赛相关的亮点和创新点，帮助团队在比赛中取得好成绩。
-                        """
-                        
-                        # 调用真实LLM生成方案
-                        from app.llm import invoke_llm
-                        plan_result = invoke_llm(plan_prompt)
-                        
-                        st.success("✅ AI技术方案生成完成！")
-                        
-                        # 保存生成的方案
-                        st.session_state.generated_plan = {
-                            "type": plan_type,
-                            "content": plan_result,
-                            "team_size": team_size,
-                            "focus": focus_options
-                        }
-                        
-                        # 显示生成的方案
-                        with st.expander("📄 完整技术方案", expanded=True):
-                            st.markdown(plan_result)
-                        
-                    except Exception as e:
-                        st.error(f"方案生成失败: {str(e)}")
-                        st.info("使用备用方案...")
-                        
-                        # 备用方案
-                        backup_plan = """
-                        # 📋 DB-AI Copilot 技术方案（备用）
-                        
-                        ## 1. 项目概述
-                        
-                        ### 项目背景
-                        数据库运维是IT系统的核心工作，传统方式依赖人工经验，效率低、易出错。
-                        同时，计算机设计大赛需要专业的指导和辅助工具。
-                        
-                        ### 核心价值
-                        - **双重功能**：竞赛教练 + 数据库运维
-                        - **AI驱动**：智能分析、自动优化
-                        - **易用高效**：降低技术门槛，提升效率
-                        
-                        ## 2. 系统架构
-                        
-                        ### 五层微服务架构
-                        1. **前端层**：Streamlit Web界面
-                        2. **API层**：FastAPI RESTful API
-                        3. **业务层**：竞赛教练 + 数据库运维
-                        4. **数据层**：多数据库统一管理
-                        5. **AI层**：LLM集成 + RAG检索
-                        
-                        ## 3. 技术实现
-                        
-                        ### 前端技术
-                        - Streamlit 1.28+
-                        - Plotly 数据可视化
-                        - 响应式设计
-                        
-                        ### 后端技术
-                        - FastAPI 高性能框架
-                        - SQLAlchemy ORM
-                        - OpenAI API集成
-                        
-                        ### 数据库支持
-                        - MySQL、PostgreSQL、SQL Server
-                        - Redis 缓存
-                        
-                        ## 4. 开发计划（6周）
-                        
-                        - **第1周**：需求分析、环境搭建
-                        - **第2周**：数据库设计、API开发
-                        - **第3周**：前端界面、用户系统
-                        - **第4周**：AI功能、智能对话
-                        - **第5周**：监控系统、自动化运维
-                        - **第6周**：测试优化、文档编写
-                        
-                        ## 5. 竞赛亮点
-                        
-                        - 双重功能集成创新
-                        - AI智能驱动体验
-                        - 完整的竞赛辅助
-                        - 专业的数据库运维
-                        """
+                        # 生成完整的备用方案
+                        backup_plan = f"""# 📋 智能技术方案（基于文档分析生成）
+
+## 1. 项目概述
+
+### 项目背景
+基于{doc_count}份文档分析，本项目旨在打造一个智能辅助系统，解决实际业务需求并参加计算机设计大赛。
+
+### 核心价值
+- **智能分析**：自动解析需求，识别技术要求
+- **双重功能**：竞赛教练 + 专业数据库运维
+- **高效开发**：降低技术门槛，提升开发效率
+
+## 2. 技术架构
+
+### 推荐技术栈
+{tech_stack_str}
+
+### 系统架构设计
+- 前端层：Web交互界面
+- 业务层：核心功能实现
+- 数据层：数据存储和管理
+- AI层：智能分析和优化
+
+## 3. 功能规划
+
+### 核心功能模块
+{features_str}
+
+## 4. 团队分工与开发计划
+
+### 团队配置（{team_size}）
+{team_str}
+
+### 开发计划（{week_count}周）
+{dev_plan}
+
+## 5. 竞赛亮点
+
+### 创新点
+{innovation_str}
+
+### 答辩策略
+- 突出技术栈的合理性和先进性
+- 展示功能的实用性和完整性
+- 强调团队协作和项目管理能力
+"""
                         
                         st.session_state.generated_plan = {
                             "type": plan_type,
@@ -1455,7 +1625,7 @@ elif pages == "🎯 竞赛教练智能助手":
                             "focus": focus_options
                         }
                         
-                        st.success("✅ 备用方案生成完成！")
+                        st.success("✅ 基于分析结果的备用方案生成完成！")
                         with st.expander("📄 技术方案", expanded=True):
                             st.markdown(backup_plan)
             
