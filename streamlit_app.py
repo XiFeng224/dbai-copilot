@@ -1161,49 +1161,6 @@ elif pages == "🎯 竞赛教练智能助手":
                 with col_download2:
                     if st.button("📋 导出为Word", use_container_width=True):
                         st.success("✅ Word文档已准备好下载！")
-                
-                # 功能特性展示
-                st.subheader("✨ 核心功能特性")
-                cols = st.columns(2)
-                for i, feature in enumerate(st.session_state.generated_plan["features"]):
-                    with cols[i % 2]:
-                        st.markdown(f"✅ {feature}")
-                
-                # 文档下载功能
-                st.subheader("📥 文档下载")
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    if st.button("📋 下载技术方案", use_container_width=True):
-                        st.success("✅ 技术方案文档已生成，准备下载...")
-                        # 这里可以添加实际的文档生成和下载逻辑
-                
-                with col2:
-                    if st.button("📊 下载架构图", use_container_width=True):
-                        st.success("✅ 系统架构图已生成，准备下载...")
-                
-                with col3:
-                    if st.button("📅 下载开发计划", use_container_width=True):
-                        st.success("✅ 详细开发计划已生成，准备下载...")
-                
-                # 一键生成所有文档
-                if st.button("🚀 一键生成完整文档包", type="primary", use_container_width=True):
-                    with st.spinner("🤖 正在生成完整文档包..."):
-                        import time
-                        time.sleep(3)
-                        st.success("✅ 完整文档包已生成！包含：技术方案、架构图、开发计划、API文档")
-                        
-                        # 模拟生成下载链接
-                        st.markdown("""
-                        **📦 生成的文档包包含：**
-                        - 📋 详细技术方案文档 (PDF)
-                        - 🏗️ 系统架构图 (PNG/SVG)
-                        - 📊 数据库设计文档 (Word)
-                        - 📅 6周开发计划表 (Excel)
-                        - 🔧 API接口文档 (Markdown)
-                        - 🧪 测试用例文档 (Excel)
-                        - 🚀 部署指南 (PDF)
-                        """)
         else:
             st.info("📝 请先完成需求分析")
     
