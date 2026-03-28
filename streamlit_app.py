@@ -591,14 +591,14 @@ elif pages == "🎯 竞赛教练智能助手":
             
             # 显示上传的文档列表
             st.subheader("📋 已上传文档")
-            for doc in st.session_state.competition_docs:
+            for i, doc in enumerate(st.session_state.competition_docs):
                 col1, col2, col3 = st.columns([3, 1, 1])
                 with col1:
                     st.write(f"📄 {doc['name']}")
                 with col2:
                     st.write(f"📊 {doc['size']} bytes")
                 with col3:
-                    if st.button("🗑️", key=f"delete_{doc['name']}"):
+                    if st.button("🗑️", key=f"delete_{i}_{doc['name']}"):
                         st.session_state.competition_docs = [d for d in st.session_state.competition_docs if d['name'] != doc['name']]
                         st.rerun()
         
@@ -1016,7 +1016,7 @@ else:
             users = st.session_state.security_manager.user_manager.users
             
             if users:
-                for username, user_info in users.items():
+                for i, (username, user_info) in enumerate(users.items()):
                     col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 1])
                     
                     with col1:
@@ -1035,14 +1035,14 @@ else:
                     
                     with col4:
                         # 编辑角色
-                        if st.button("✏️", key=f"edit_{username}"):
+                        if st.button("✏️", key=f"edit_{i}_{username}"):
                             st.session_state.editing_user = username
                             st.rerun()
                     
                     with col5:
                         # 删除用户（不能删除自己）
                         if username != st.session_state.username:
-                            if st.button("🗑️", key=f"delete_{username}"):
+                            if st.button("🗑️", key=f"delete_{i}_{username}"):
                                 if st.session_state.security_manager.delete_user(username):
                                     st.success(f"✅ 用户 {username} 已删除")
                                     st.rerun()
