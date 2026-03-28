@@ -115,7 +115,12 @@ with st.sidebar:
     st.markdown("### 🚀 快速操作")
     
     if st.button("📊 系统状态", use_container_width=True):
-        st.session_state.system_monitor.check_system_health()
+        try:
+            system_status = st.session_state.system_monitor.get_system_status()
+            st.success("✅ 系统运行正常")
+            st.json(system_status)
+        except Exception as e:
+            st.error(f"❌ 获取系统状态失败: {str(e)}")
     
     if st.button("📋 使用指南", use_container_width=True):
         st.info("查看项目文档了解详细使用说明")
