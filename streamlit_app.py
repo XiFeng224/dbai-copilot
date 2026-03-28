@@ -664,24 +664,62 @@ elif pages == "🎯 竞赛教练智能助手":
         )
         
         if uploaded_files:
+            import tempfile
+            import os
+            
             for uploaded_file in uploaded_files:
-                st.session_state.competition_docs.append({
-                    "name": uploaded_file.name,
-                    "size": uploaded_file.size,
-                    "type": uploaded_file.type
-                })
+                # 保存文档到临时文件并解析内容
+                with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
+                    tmp_file.write(uploaded_file.getvalue())
+                    tmp_file_path = tmp_file.name
+                
+                try:
+                    # 使用项目的文档加载器解析文档
+                    from app.doc_loader import load_file
+                    docs = load_file(tmp_file_path, uploaded_file.name)
+                    
+                    # 提取文档内容
+                    doc_content = "\n".join([doc.page_content for doc in docs])
+                    
+                    # 保存文档信息和内容
+                    st.session_state.competition_docs.append({
+                        "name": uploaded_file.name,
+                        "size": uploaded_file.size,
+                        "type": uploaded_file.type,
+                        "content": doc_content,
+                        "chunks": len(docs)
+                    })
+                    
+                except Exception as e:
+                    st.warning(f"⚠️ 文档 {uploaded_file.name} 解析失败: {str(e)}")
+                    # 至少保存文档元信息
+                    st.session_state.competition_docs.append({
+                        "name": uploaded_file.name,
+                        "size": uploaded_file.size,
+                        "type": uploaded_file.type,
+                        "content": "",
+                        "chunks": 0
+                    })
+                finally:
+                    # 清理临时文件
+                    try:
+                        os.unlink(tmp_file_path)
+                    except:
+                        pass
             
             st.success(f"✅ 成功上传 {len(uploaded_files)} 个文档")
             
             # 显示上传的文档列表
             st.subheader("📋 已上传文档")
             for i, doc in enumerate(st.session_state.competition_docs):
-                col1, col2, col3 = st.columns([3, 1, 1])
+                col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
                 with col1:
                     st.write(f"📄 {doc['name']}")
                 with col2:
                     st.write(f"📊 {doc['size']} bytes")
                 with col3:
+                    st.write(f"📝 {doc.get('chunks', 0)} 段")
+                with col4:
                     if st.button("🗑️", key=f"delete_{i}_{doc['name']}"):
                         st.session_state.competition_docs = [d for d in st.session_state.competition_docs if d['name'] != doc['name']]
                         st.rerun()
@@ -696,147 +734,285 @@ elif pages == "🎯 竞赛教练智能助手":
         
         if st.button("🚀 开始分析", type="primary", use_container_width=True):
             if st.session_state.competition_docs or manual_input:
-                with st.spinner("🤖 AI正在深度分析比赛需求..."):
+                with st.spinner("🤖 AI Agent正在深度分析比赛需求..."):
                     import time
+                    import re
                     
-                    # 收集上传的文档信息
-                    doc_info = ""
-                    if st.session_state.competition_docs:
-                        doc_names = [doc["name"] for doc in st.session_state.competition_docs]
-                        doc_info = f"已上传文档：{', '.join(doc_names)}\n\n"
+                    # 收集所有文档内容
+                    all_doc_content = ""
+                    doc_names = []
+                    total_chunks = 0
                     
-                    # 构建基于用户输入的个性化分析
-                    user_input_content = manual_input if manual_input else "基于默认项目需求"
+                    for doc in st.session_state.competition_docs:
+                        doc_names.append(doc["name"])
+                        total_chunks += doc.get("chunks", 0)
+                        if doc.get("content"):
+                            all_doc_content += f"\n\n=== 文档: {doc['name']} ===\n"
+                            all_doc_content += doc["content"]
                     
-                    # 智能分析进度展示
+                    user_input_content = manual_input if manual_input else ""
+                    
+                    # 智能分析进度展示（Agent执行步骤）
                     progress_bar = st.progress(0)
                     status_text = st.empty()
                     
-                    status_text.text("📄 正在解析文档内容...")
-                    time.sleep(0.8)
-                    progress_bar.progress(25)
+                    status_text.text("📄 步骤1/5: 正在读取并解析文档...")
+                    time.sleep(1)
+                    progress_bar.progress(20)
                     
-                    status_text.text("🧠 正在提取关键需求...")
-                    time.sleep(0.8)
-                    progress_bar.progress(50)
+                    # Step 1: 从文档中提取关键词
+                    status_text.text("🔍 步骤2/5: 正在提取关键信息和需求...")
                     
-                    status_text.text("🎯 正在识别技术要求...")
-                    time.sleep(0.8)
-                    progress_bar.progress(75)
+                    # 智能提取关键词
+                    keywords = {
+                        "technologies": set(),
+                        "features": set(),
+                        "requirements": set(),
+                        "constraints": set()
+                    }
                     
-                    status_text.text("✨ 正在挖掘创新亮点...")
-                    time.sleep(0.6)
-                    progress_bar.progress(100)
-                    status_text.empty()
+                    # 合并所有文本进行分析
+                    full_text = all_doc_content + "\n" + user_input_content
+                    full_text_lower = full_text.lower()
                     
-                    # 生成更真实、更个性化的分析结果
-                    analysis_requirements = f"""基于分析，识别出以下核心需求：
-
-**📋 项目概述**
-- **文档信息**：{doc_info if doc_info else '未上传文档，使用手动输入'}
-- **用户输入**：{user_input_content[:200]}...
-
-**🎯 项目目标**
-开发一个智能竞赛辅助系统，帮助团队高效准备计算机设计大赛
-
-**⚙️ 技术要求**
-- 支持Web界面展示和交互
-- 提供智能分析和建议功能
-- 支持文档管理和方案生成
-- 现代化的用户体验设计
-
-**📦 功能需求**
-1. 需求分析和项目规划
-2. 技术方案设计和优化
-3. Demo演示和答辩准备
-4. 团队协作和进度管理
-
-**⚡ 性能要求**
-- 响应速度快，交互流畅
-- 支持多用户同时使用
-- 界面美观，操作直观
-
-**🔒 质量要求**
-- 代码规范，结构清晰
-- 文档完整，易于维护
-- 测试充分，稳定性高"""
-
-                    # 根据用户输入智能调整技术栈
-                    tech_stack_list = [
-                        "Python 3.12", "Streamlit (Web框架)", 
-                        "OpenAI API (AI智能)", "Plotly (数据可视化)",
-                        "Pandas (数据处理)", "Git (版本控制)"
+                    # 技术栈关键词检测
+                    tech_keywords = {
+                        "Python": ["python", "pyhton"],
+                        "Streamlit": ["streamlit"],
+                        "FastAPI": ["fastapi"],
+                        "MySQL": ["mysql"],
+                        "PostgreSQL": ["postgresql", "postgres"],
+                        "SQL Server": ["sql server", "mssql"],
+                        "Redis": ["redis"],
+                        "OpenAI": ["openai", "gpt", "llm"],
+                        "LangChain": ["langchain"],
+                        "Docker": ["docker", "容器"],
+                        "机器学习": ["机器学习", "machine learning", "ml"],
+                        "深度学习": ["深度学习", "deep learning", "dl"],
+                        "人工智能": ["人工智能", "ai", "artificial intelligence"],
+                        "React": ["react"],
+                        "Vue": ["vue"],
+                        "Node.js": ["node.js", "nodejs"],
+                        "响应式": ["响应式", "responsive", "移动端", "mobile"],
+                        "实时": ["实时", "realtime", "websocket"],
+                        "微服务": ["微服务", "microservice"],
+                        "分布式": ["分布式", "distributed"]
+                    }
+                    
+                    for tech, patterns in tech_keywords.items():
+                        for pattern in patterns:
+                            if pattern in full_text_lower:
+                                keywords["technologies"].add(tech)
+                                break
+                    
+                    # 功能需求关键词检测
+                    feature_keywords = {
+                        "用户认证": ["用户认证", "登录", "login", "auth"],
+                        "权限管理": ["权限管理", "权限", "permission", "role"],
+                        "实时监控": ["实时监控", "监控", "monitor"],
+                        "数据分析": ["数据分析", "分析", "analysis"],
+                        "数据可视化": ["数据可视化", "可视化", "visualization", "图表", "chart"],
+                        "自动化运维": ["自动化运维", "自动化", "automation"],
+                        "智能对话": ["智能对话", "对话", "chat", "问答"],
+                        "文档管理": ["文档管理", "文档", "document"],
+                        "任务调度": ["任务调度", "调度", "schedule", "定时"],
+                        "告警通知": ["告警", "通知", "alert", "notification"],
+                        "备份恢复": ["备份", "恢复", "backup", "restore"],
+                        "性能优化": ["性能优化", "优化", "optimization"],
+                        "团队协作": ["团队协作", "协作", "collaboration", "team"]
+                    }
+                    
+                    for feature, patterns in feature_keywords.items():
+                        for pattern in patterns:
+                            if pattern in full_text_lower:
+                                keywords["features"].add(feature)
+                                break
+                    
+                    time.sleep(1)
+                    progress_bar.progress(40)
+                    
+                    status_text.text("🧠 步骤3/5: 正在理解项目目标和范围...")
+                    
+                    # 构建技术栈
+                    base_tech = ["Python 3.12", "Git (版本控制)"]
+                    for tech in keywords["technologies"]:
+                        if tech == "Python":
+                            continue
+                        elif tech == "Streamlit":
+                            base_tech.append("Streamlit (Web框架)")
+                        elif tech == "FastAPI":
+                            base_tech.append("FastAPI (后端API)")
+                        elif tech in ["MySQL", "PostgreSQL", "SQL Server"]:
+                            base_tech.append(f"{tech} (数据库)")
+                        elif tech == "Redis":
+                            base_tech.append("Redis (缓存)")
+                        elif tech in ["OpenAI", "LangChain"]:
+                            base_tech.append("OpenAI/LangChain (AI服务)")
+                        elif tech == "Docker":
+                            base_tech.append("Docker (容器化)")
+                        elif tech in ["机器学习", "深度学习", "人工智能"]:
+                            if "OpenAI/LangChain (AI服务)" not in base_tech:
+                                base_tech.append("AI/ML (智能分析)")
+                        elif tech == "响应式":
+                            base_tech.append("响应式设计")
+                        elif tech == "实时":
+                            base_tech.append("WebSocket (实时通信)")
+                        elif tech in ["微服务", "分布式"]:
+                            base_tech.append(f"{tech}架构")
+                    
+                    # 如果没有检测到特定技术，添加默认推荐
+                    if not any("Streamlit" in t for t in base_tech) and not any("React" in t for t in base_tech) and not any("Vue" in t for t in base_tech):
+                        base_tech.insert(1, "Streamlit (Web框架)")
+                    if not any("API" in t for t in base_tech):
+                        base_tech.insert(2, "FastAPI (后端API)")
+                    if not any("AI" in t for t in base_tech) and not any("OpenAI" in t for t in base_tech):
+                        base_tech.append("OpenAI API (AI智能)")
+                    if not any("可视化" in t for t in base_tech) and not any("Plotly" in t for t in base_tech):
+                        base_tech.append("Plotly (数据可视化)")
+                    if not any("Pandas" in t for t in base_tech):
+                        base_tech.append("Pandas (数据处理)")
+                    
+                    tech_stack_list = base_tech
+                    
+                    time.sleep(1)
+                    progress_bar.progress(60)
+                    
+                    status_text.text("🎯 步骤4/5: 正在生成功能规划和技术方案...")
+                    
+                    # 构建功能列表
+                    base_features = [
+                        "智能需求分析 - 自动解析比赛要求",
+                        "技术方案生成 - 专业架构和选型建议",
+                        "Demo演示剧本 - 个性化演示脚本",
+                        "答辩材料准备 - 完整答辩大纲"
                     ]
                     
-                    # 根据输入内容添加相关技术
-                    if "数据库" in user_input_content or "database" in user_input_content.lower():
-                        tech_stack_list.extend(["MySQL/PostgreSQL", "SQLAlchemy (ORM)"])
-                    if "移动端" in user_input_content or "mobile" in user_input_content.lower():
-                        tech_stack_list.append("响应式设计")
-                    if "实时" in user_input_content or "realtime" in user_input_content.lower():
-                        tech_stack_list.append("WebSocket (实时通信)")
+                    for feature in keywords["features"]:
+                        if feature == "用户认证":
+                            base_features.append("用户认证系统 - 安全登录和权限管理")
+                        elif feature == "权限管理":
+                            base_features.append("多级权限控制 - 精细的权限管理")
+                        elif feature == "实时监控":
+                            base_features.append("实时监控系统 - 性能指标采集和展示")
+                        elif feature == "数据分析":
+                            base_features.append("智能数据分析 - 深度数据洞察")
+                        elif feature == "数据可视化":
+                            base_features.append("数据可视化 - 直观的图表展示")
+                        elif feature == "自动化运维":
+                            base_features.append("自动化运维 - 定时任务和智能优化")
+                        elif feature == "智能对话":
+                            base_features.append("AI智能对话 - 自然语言问答")
+                        elif feature == "文档管理":
+                            base_features.append("文档管理 - 完整的文档生命周期")
+                        elif feature == "任务调度":
+                            base_features.append("任务调度 - 灵活的定时任务")
+                        elif feature == "告警通知":
+                            base_features.append("告警通知 - 实时异常提醒")
+                        elif feature == "备份恢复":
+                            base_features.append("备份恢复 - 数据安全保障")
+                        elif feature == "性能优化":
+                            base_features.append("性能优化 - 智能索引和SQL优化")
+                        elif feature == "团队协作":
+                            base_features.append("团队协作 - 任务分配和进度跟踪")
                     
-                    # 生成功能特性
-                    feature_list = [
-                        "智能需求分析 - AI自动解析比赛要求",
-                        "技术方案生成 - 专业的架构和技术选型建议",
-                        "Demo剧本定制 - 个性化的演示脚本",
-                        "答辩材料准备 - 完整的答辩大纲和问题准备",
-                        "团队协作工具 - 任务分配和进度跟踪"
-                    ]
+                    feature_list = base_features
+                    
+                    time.sleep(1)
+                    progress_bar.progress(80)
+                    
+                    status_text.text("✨ 步骤5/5: 正在生成最终分析报告...")
                     
                     # 智能评估难度
                     difficulty_level = "中级"
-                    if len(tech_stack_list) > 6 or "AI" in user_input_content:
+                    if len(tech_stack_list) > 7 or "AI" in str(tech_stack_list) or "机器学习" in full_text_lower:
                         difficulty_level = "中高级"
-                    if "机器学习" in user_input_content or "分布式" in user_input_content:
+                    if len(tech_stack_list) > 9 or "分布式" in full_text_lower or "微服务" in full_text_lower:
                         difficulty_level = "高级"
                     
-                    # 智能风险分析
-                    risk_content = f"""**⚠️ 风险分析**
+                    # 构建文档信息
+                    doc_info_str = ""
+                    if doc_names:
+                        doc_info_str = f"已分析文档：{', '.join(doc_names)}\n"
+                        doc_info_str += f"总段落数：{total_chunks}\n"
+                    if user_input_content:
+                        doc_info_str += f"手动输入：{user_input_content[:150]}..."
+                    
+                    # 生成需求分析报告
+                    analysis_requirements = f"""基于智能分析，识别出以下核心需求：
+
+**📋 分析概览**
+{doc_info_str if doc_info_str else '基于默认项目需求分析'}
+
+**🎯 项目目标**
+基于文档内容分析，这是一个面向计算机设计大赛的智能辅助系统，旨在帮助团队高效完成项目准备、技术方案设计和答辩准备工作。
+
+**⚙️ 核心技术要求**
+{chr(10).join([f'- {tech}' for tech in tech_stack_list[:6]])}
+
+**📦 关键功能需求**
+{chr(10).join([f'{i+1}. {feature.split(' - ')[0]}' for i, feature in enumerate(feature_list[:5])])}
+
+**⚡ 性能与质量要求**
+- 响应速度快，交互流畅
+- 界面美观，操作直观
+- 代码规范，结构清晰
+- 文档完整，易于维护"""
+
+                    # 风险分析
+                    risk_content = f"""**⚠️ 智能风险分析**
 
 **技术风险**：
-- 新技术学习曲线：需要掌握{len(tech_stack_list)}项技术
-- 集成复杂度：多模块协同可能存在挑战
-- 时间风险：功能丰富，需要合理规划开发周期
+- 技术栈复杂度：项目涉及{len(tech_stack_list)}项技术，需要合理规划学习曲线
+- 集成挑战：多模块协同需要良好的架构设计
+- 时间压力：功能丰富，需要分阶段实施
 
 **应对策略**：
-- 分阶段实施，优先完成核心功能
-- 充分利用现有开源组件
-- 建立代码审查和测试机制"""
+- 优先实现核心功能，迭代完善
+- 充分利用开源组件和最佳实践
+- 建立代码审查和测试机制
+- 合理分配任务，发挥团队优势"""
 
-                    # 智能创新点
-                    innovation_content = f"""**💡 创新亮点**
+                    # 创新点
+                    innovation_content = f"""**💡 创新亮点挖掘**
 
 **技术创新**：
-- AI驱动的智能分析引擎
-- 个性化方案生成算法
-- 自动化文档处理
+- 智能文档解析与需求分析
+- 个性化方案自动生成
+- AI辅助的全流程竞赛指导
 
 **应用创新**：
-- 竞赛全流程辅助
-- 团队协作智能化
-- 知识沉淀和复用
+- 竞赛准备与数据库运维的双重功能集成
+- 从需求到答辩的全流程辅助
+- 团队协作与知识沉淀
 
 **体验创新**：
-- 直观的用户界面
-- 流畅的交互体验
-- 智能提示和引导"""
+- 直观的用户界面设计
+- 智能化的交互体验
+- 可视化的数据展示"""
 
-                    # 生成详细的分析结果
+                    time.sleep(0.5)
+                    progress_bar.progress(100)
+                    status_text.empty()
+                    
+                    # 生成最终分析结果
                     st.session_state.competition_analysis = {
                         "requirements": analysis_requirements,
                         "tech_stack": tech_stack_list,
                         "features": feature_list,
-                        "difficulty": f"{difficulty_level}（需要掌握{len(tech_stack_list)}项技术，涉及{len(feature_list)}个功能模块）",
+                        "difficulty": f"{difficulty_level}（涉及{len(tech_stack_list)}项技术，{len(feature_list)}个功能模块）",
                         "timeline": f"{6 if difficulty_level == '高级' else 5}周详细开发计划",
                         "risk_analysis": risk_content,
                         "innovation_points": innovation_content,
-                        "doc_count": len(st.session_state.competition_docs),
-                        "has_manual_input": bool(manual_input)
+                        "doc_count": len(doc_names),
+                        "has_manual_input": bool(manual_input),
+                        "total_chunks": total_chunks,
+                        "keywords": {
+                            "technologies": list(keywords["technologies"]),
+                            "features": list(keywords["features"])
+                        }
                     }
                     
-                    st.success(f"✅ 深度需求分析完成！已分析{len(st.session_state.competition_docs)}个文档，识别出{len(tech_stack_list)}项技术和{len(feature_list)}个功能模块")
+                    st.success(f"✅ Agent分析完成！已分析{len(doc_names)}个文档({total_chunks}段)，识别出{len(tech_stack_list)}项技术和{len(feature_list)}个功能")
             else:
                 st.warning("⚠️ 请上传文档或输入需求描述")
     
@@ -848,14 +1024,40 @@ elif pages == "🎯 竞赛教练智能助手":
             analysis = st.session_state.competition_analysis
             doc_count = analysis.get("doc_count", 0)
             has_manual = analysis.get("has_manual_input", False)
+            total_chunks = analysis.get("total_chunks", 0)
+            keywords = analysis.get("keywords", {})
             
             st.info(f"""
             📊 **分析概览**
             - 已分析文档数：{doc_count}
+            - 文档总段落：{total_chunks}
             - 包含手动输入：{'是' if has_manual else '否'}
             - 识别技术数：{len(analysis['tech_stack'])}
             - 功能模块数：{len(analysis['features'])}
             """)
+            
+            # 显示提取的关键词
+            if keywords:
+                st.markdown("---")
+                col_key1, col_key2 = st.columns(2)
+                
+                with col_key1:
+                    st.subheader("🔧 识别的技术关键词")
+                    tech_keywords = keywords.get("technologies", [])
+                    if tech_keywords:
+                        for tech in tech_keywords:
+                            st.markdown(f"- 🔹 {tech}")
+                    else:
+                        st.info("未识别到特定技术关键词，使用推荐技术栈")
+                
+                with col_key2:
+                    st.subheader("📦 识别的功能关键词")
+                    feat_keywords = keywords.get("features", [])
+                    if feat_keywords:
+                        for feat in feat_keywords:
+                            st.markdown(f"- 🔸 {feat}")
+                    else:
+                        st.info("未识别到特定功能关键词，使用推荐功能")
             
             st.markdown("---")
             
